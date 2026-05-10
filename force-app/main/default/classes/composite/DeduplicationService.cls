@@ -42,12 +42,19 @@ public with sharing class DeduplicationService {
      * @return          Best MatchResult, or null if no match found
      */
     public MatchResult findBestMatch(String email, String phone, String loyaltyId) {
+        if (email == null && phone == null && loyaltyId == null) return null;
+
+        final String S = '__NULL__';
+        String safeEmail     = email     != null ? email     : S;
+        String safePhone     = phone     != null ? phone     : S;
+        String safeLoyaltyId = loyaltyId != null ? loyaltyId : S;
+
         List<Contact> candidates = [
             SELECT Id, FirstName, LastName, Email, Phone, Loyalty_Member_Id__c
             FROM   Contact
-            WHERE  (Email = :email          AND :email != null)
-               OR  (Phone = :phone          AND :phone != null)
-               OR  (Loyalty_Member_Id__c = :loyaltyId AND :loyaltyId != null)
+            WHERE  Email = :safeEmail
+               OR  Phone = :safePhone
+               OR  Loyalty_Member_Id__c = :safeLoyaltyId
             LIMIT  10
         ];
 

@@ -69,18 +69,24 @@ global with sharing class LoyaltyLookupController {
         String normalizedPhone = String.isNotBlank(phone)
             ? phone.replaceAll('[^0-9]', '')
             : null;
-        String phoneSearch = normalizedPhone != null
-            ? '%' + normalizedPhone.right(10) + '%'
-            : '%NOMATCH%';
+
+        if (email == null && normalizedPhone == null && loyaltyId == null && cardNumber == null) return null;
+
+        // Use sentinels so null params never match real records in the OR query
+        final String S = '__NULL__';
+        String safeEmail      = email          != null ? email                                        : S;
+        String phoneSearch    = normalizedPhone != null ? '%' + normalizedPhone.right(10) + '%'       : S;
+        String safeLoyaltyId  = loyaltyId      != null ? loyaltyId                                   : S;
+        String safeCardNumber = cardNumber     != null ? cardNumber                                   : S;
 
         List<Contact> contacts = [
             SELECT Id, FirstName, LastName, Has_Loyalty__c, Loyalty_Member_Id__c,
                    Loyalty_Member_Type__c, Country_Code__c, RCC_Active__c, RCC_Card_Number__c
             FROM   Contact
-            WHERE  (Email = :email                              AND :email != null)
-               OR  (Phone LIKE :phoneSearch                    AND :normalizedPhone != null)
-               OR  (Loyalty_Member_Id__c = :loyaltyId          AND :loyaltyId != null)
-               OR  (RCC_Card_Number__c = :cardNumber            AND :cardNumber != null)
+            WHERE  Email = :safeEmail
+               OR  Phone LIKE :phoneSearch
+               OR  Loyalty_Member_Id__c = :safeLoyaltyId
+               OR  RCC_Card_Number__c = :safeCardNumber
             LIMIT  1
         ];
         return contacts.isEmpty() ? null : contacts[0];

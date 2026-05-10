@@ -79,15 +79,24 @@ public with sharing class ContactMatchService {
         String loyaltyId = String.isBlank(dto.loyaltyId)  ? null : dto.loyaltyId;
         String epsilonId = String.isBlank(dto.epsilonId)  ? null : dto.epsilonId;
 
+        if (email == null && phone == null && loyaltyId == null && epsilonId == null) return null;
+
+        // Use sentinel values so null params never match real records in the OR query
+        final String S = '__NULL__';
+        String safeEmail     = email     != null ? email     : S;
+        String safePhone     = phone     != null ? phone     : S;
+        String safeLoyaltyId = loyaltyId != null ? loyaltyId : S;
+        String safeEpsilonId = epsilonId != null ? epsilonId : S;
+
         List<Contact> candidates = [
             SELECT Id, FirstName, LastName, Email, Phone,
                    Has_Loyalty__c, Loyalty_Member_Id__c, Loyalty_Member_Type__c,
                    Epsilon_Profile_Id__c, Country_Code__c, RCC_Active__c
             FROM   Contact
-            WHERE  (Email = :email          AND :email != null)
-               OR  (Phone = :phone          AND :phone != null)
-               OR  (Loyalty_Member_Id__c = :loyaltyId AND :loyaltyId != null)
-               OR  (Epsilon_Profile_Id__c = :epsilonId AND :epsilonId != null)
+            WHERE  Email = :safeEmail
+               OR  Phone = :safePhone
+               OR  Loyalty_Member_Id__c = :safeLoyaltyId
+               OR  Epsilon_Profile_Id__c = :safeEpsilonId
             LIMIT  5
         ];
 
