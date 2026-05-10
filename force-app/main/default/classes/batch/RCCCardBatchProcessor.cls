@@ -130,7 +130,7 @@ public with sharing class RCCCardBatchProcessor
             + 'Total: ' + stats.totalProcessed + '\n'
             + 'Succeeded: ' + stats.succeeded + '\n'
             + 'Failed: ' + stats.failed + '\n'
-            + (stats.failed > 0 ? 'Errors:\n' + String.join(stats.errors.subList(0, Math.min(10, stats.errors.size())), '\n') : '')
+            + (stats.failed > 0 ? 'Errors:\n' + String.join(firstN(stats.errors, 10), '\n') : '')
         );
         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ email });
     }
@@ -152,5 +152,14 @@ public with sharing class RCCCardBatchProcessor
     private String getProgramName() {
         return [SELECT Program_API_Name__c FROM Loyalty_Program_Config__mdt
                 WHERE DeveloperName = 'Default' LIMIT 1].Program_API_Name__c;
+    }
+
+    private static List<String> firstN(List<String> src, Integer n) {
+        List<String> result = new List<String>();
+        Integer limit = Math.min(n, src.size());
+        for (Integer i = 0; i < limit; i++) {
+            result.add(src[i]);
+        }
+        return result;
     }
 }

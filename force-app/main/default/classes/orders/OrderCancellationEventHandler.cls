@@ -85,9 +85,9 @@ public with sharing class OrderCancellationEventHandler {
         }
     }
 
-    private List<String> parseVoucherCodes(String json) {
+    private List<String> parseVoucherCodes(String jsonStr) {
         try {
-            List<Object> raw = (List<Object>) JSON.deserializeUntyped(json);
+            List<Object> raw = (List<Object>) JSON.deserializeUntyped(jsonStr);
             List<String> codes = new List<String>();
             for (Object r : raw) {
                 codes.add((String) r);

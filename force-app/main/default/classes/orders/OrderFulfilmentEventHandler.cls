@@ -87,10 +87,10 @@ public with sharing class OrderFulfilmentEventHandler {
         statusService.markPointsAwarded(evt.Order_Id__c, tjId);
     }
 
-    private List<CartLineItem> parseLineItems(String json) {
-        if (String.isBlank(json)) return new List<CartLineItem>();
+    private List<CartLineItem> parseLineItems(String jsonStr) {
+        if (String.isBlank(jsonStr)) return new List<CartLineItem>();
         try {
-            List<Object> raw = (List<Object>) JSON.deserializeUntyped(json);
+            List<Object> raw = (List<Object>) JSON.deserializeUntyped(jsonStr);
             List<CartLineItem> items = new List<CartLineItem>();
             for (Object r : raw) {
                 Map<String, Object> m = (Map<String, Object>) r;
