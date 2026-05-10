@@ -6,7 +6,6 @@
     <description>Staging record for each row in an RCC card import batch file. Processed by RCCCardBatchProcessor.</description>
     <enableActivities>false</enableActivities>
     <enableBulkApi>true</enableBulkApi>
-    <enableChangeDataCapture>false</enableChangeDataCapture>
     <enableFeeds>false</enableFeeds>
     <enableHistory>false</enableHistory>
     <enableReports>true</enableReports>

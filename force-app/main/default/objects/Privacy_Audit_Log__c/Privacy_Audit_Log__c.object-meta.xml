@@ -5,14 +5,13 @@
     <deploymentStatus>Deployed</deploymentStatus>
     <description>Immutable audit trail written by PrivacyDeletionService. One record per step of the deletion/anonymisation workflow. Used for GDPR/CCPA compliance evidence.</description>
     <enableActivities>false</enableActivities>
-    <enableBulkApi>true</enableBulkApi>
-    <enableChangeDataCapture>false</enableChangeDataCapture>
+    <enableBulkApi>false</enableBulkApi>
     <enableFeeds>false</enableFeeds>
     <enableHistory>false</enableHistory>
     <enableReports>true</enableReports>
     <enableSearch>false</enableSearch>
     <enableSharing>false</enableSharing>
-    <enableStreamingApi>true</enableStreamingApi>
+    <enableStreamingApi>false</enableStreamingApi>
     <label>Privacy Audit Log</label>
     <nameField>
         <displayFormat>PAL-{0000000}</displayFormat>

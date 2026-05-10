@@ -3,7 +3,6 @@
     <fullName>Email__c</fullName>
     <externalId>false</externalId>
     <label>Email</label>
-    <length>254</length>
     <required>false</required>
     <trackTrending>false</trackTrending>
     <type>Email</type>

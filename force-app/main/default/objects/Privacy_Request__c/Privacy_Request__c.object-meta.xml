@@ -6,7 +6,6 @@
     <description>Represents a GDPR Right-to-Erasure or CCPA deletion request. Orchestrated by Privacy_Request_Handler_Flow and executed by PrivacyDeletionService.</description>
     <enableActivities>true</enableActivities>
     <enableBulkApi>true</enableBulkApi>
-    <enableChangeDataCapture>false</enableChangeDataCapture>
     <enableFeeds>false</enableFeeds>
     <enableHistory>true</enableHistory>
     <enableReports>true</enableReports>

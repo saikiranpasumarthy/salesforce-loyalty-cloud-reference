@@ -6,7 +6,6 @@
     <referenceTo>Privacy_Request__c</referenceTo>
     <relationshipLabel>Privacy Audit Logs</relationshipLabel>
     <relationshipName>Privacy_Audit_Logs</relationshipName>
-    <required>true</required>
     <trackTrending>false</trackTrending>
     <type>MasterDetail</type>
     <writeRequiresMasterRead>false</writeRequiresMasterRead>

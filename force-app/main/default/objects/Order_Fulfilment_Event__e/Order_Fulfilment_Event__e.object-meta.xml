@@ -45,5 +45,6 @@
         <label>Cart Lines JSON</label>
         <length>131072</length>
         <type>LongTextArea</type>
+        <visibleLines>5</visibleLines>
     </fields>
 </CustomObject>

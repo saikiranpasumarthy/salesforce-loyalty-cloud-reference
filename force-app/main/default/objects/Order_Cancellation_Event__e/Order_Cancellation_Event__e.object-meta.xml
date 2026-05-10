@@ -38,7 +38,8 @@
         <description>JSON array of voucher IDs redeemed on the order that must be cancelled.</description>
         <label>Voucher IDs JSON</label>
         <length>4096</length>
-        <type>Text</type>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
     </fields>
     <fields>
         <fullName>Cancelled_At__c</fullName>

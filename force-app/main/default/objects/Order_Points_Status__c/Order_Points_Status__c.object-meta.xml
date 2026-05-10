@@ -6,7 +6,6 @@
     <description>Tracks whether a Contact has a qualifying purchase with awarded points within the rolling 365-day window — used by PointsExpiryService to determine CA exception eligibility.</description>
     <enableActivities>false</enableActivities>
     <enableBulkApi>true</enableBulkApi>
-    <enableChangeDataCapture>false</enableChangeDataCapture>
     <enableFeeds>false</enableFeeds>
     <enableHistory>false</enableHistory>
     <enableReports>true</enableReports>
