@@ -76,7 +76,7 @@ public with sharing class PointsExpiryService {
 
         if (benefits.pointsBalance == null || benefits.pointsBalance <= 0) return;
 
-        String currency = [
+        String currencyCode = [
             SELECT Currency_ISO_Code__c FROM Loyalty_Program_Config__mdt
             WHERE DeveloperName = 'Default' LIMIT 1
         ].Currency_ISO_Code__c;
@@ -84,7 +84,7 @@ public with sharing class PointsExpiryService {
         txnService.debitPoints(
             c.Loyalty_Member_Id__c,
             benefits.pointsBalance,
-            currency,
+            currencyCode,
             'ANNUAL_EXPIRY:' + Date.today().year()
         );
     }

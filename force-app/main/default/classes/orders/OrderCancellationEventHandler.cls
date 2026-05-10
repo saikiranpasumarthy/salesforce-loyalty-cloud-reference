@@ -63,7 +63,7 @@ public with sharing class OrderCancellationEventHandler {
 
         // Step 2: Reverse awarded points
         if (evt.Points_To_Reverse__c != null && evt.Points_To_Reverse__c > 0) {
-            String currency = [
+            String currencyCode = [
                 SELECT Currency_ISO_Code__c FROM Loyalty_Program_Config__mdt
                 WHERE DeveloperName = 'Default' LIMIT 1
             ].Currency_ISO_Code__c;
@@ -71,7 +71,7 @@ public with sharing class OrderCancellationEventHandler {
             txnService.debitPoints(
                 evt.Loyalty_Member_Id__c,
                 evt.Points_To_Reverse__c,
-                currency,
+                currencyCode,
                 'ORDER_CANCELLED:' + evt.Order_Id__c
             );
         }
