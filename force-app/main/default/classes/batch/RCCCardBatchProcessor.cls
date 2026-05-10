@@ -156,8 +156,8 @@ public with sharing class RCCCardBatchProcessor
 
     private static List<String> firstN(List<String> src, Integer n) {
         List<String> result = new List<String>();
-        Integer limit = Math.min(n, src.size());
-        for (Integer i = 0; i < limit; i++) {
+        Integer cap = Math.min(n, src.size());
+        for (Integer i = 0; i < cap; i++) {
             result.add(src[i]);
         }
         return result;
