@@ -110,7 +110,7 @@ public with sharing class RCCCardBatchProcessor
     public void finish(Database.BatchableContext bc) {
         // Log batch run summary
         Batch_Run_Log__c log = new Batch_Run_Log__c(
-            Batch_Type__c      = 'RCCCardBatchProcessor',
+            Batch_Type__c      = 'RCC_Card_Import',
             Completed_At__c    = DateTime.now(),
             Total_Processed__c = stats.totalProcessed,
             Total_Succeeded__c = stats.succeeded,
@@ -138,7 +138,7 @@ public with sharing class RCCCardBatchProcessor
     // ─────────────────────────────────────────────────────────────────────────
 
     private void markProcessed(RCC_Import_Record__c rec) {
-        rec.Status__c        = 'Processed';
+        rec.Status__c        = 'Enrolled';
         rec.Error_Message__c = null;
         rec.Batch_Job_Id__c  = batchRunId;
     }

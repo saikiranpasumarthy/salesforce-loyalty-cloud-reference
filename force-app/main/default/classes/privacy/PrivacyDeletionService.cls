@@ -63,31 +63,64 @@ public without sharing class PrivacyDeletionService {
             FROM Contact WHERE Id = :contactId LIMIT 1
         ];
 
-        List<String> systemsUpdated = new List<String>();
-
-        // Gate 2: Handle vouchers
-        if (c.Has_Loyalty__c && String.isNotBlank(c.Loyalty_Member_Id__c)) {
+        // ── PHASE 1: All callouts (no DML may precede these) ──────────────────
+        Boolean hasLoyalty = c.Has_Loyalty__c && String.isNotBlank(c.Loyalty_Member_Id__c);
+        if (hasLoyalty) {
+            // Gate 2: Cancel unredeemed vouchers
             handleUnredeemedVouchers(c.Loyalty_Member_Id__c);
-            auditLogger.log(contactId, 'VouchersCancelled', requestSource, requestId);
-            systemsUpdated.add('LoyaltyCloud');
-
             // Gate 3: Unenroll from Loyalty Cloud
             unenrollFromLoyalty(c.Loyalty_Member_Id__c, 'PRIVACY_REQUEST');
-            auditLogger.log(contactId, 'Unenrolled', requestSource, requestId);
         }
+
+        // ── PHASE 2: All DML (callouts complete) ──────────────────────────────
+        List<String> systemsUpdated = new List<String>();
 
         // Gate 4: Deactivate Contact and clear PII
         deactivateContact(Id.valueOf(contactId));
-        auditLogger.log(contactId, 'Deactivated', requestSource, requestId);
         systemsUpdated.add('SFSC');
+        if (hasLoyalty) systemsUpdated.add('LoyaltyCloud');
+
+        // Create / look up the master Privacy_Request__c record (required by MasterDetail)
+        Id privacyRequestSfId = ensurePrivacyRequest(contactId, requestId);
+
+        // Audit entries for each step
+        if (hasLoyalty) {
+            auditLogger.log(contactId, 'Vouchers_Cancelled', requestSource, requestId, privacyRequestSfId);
+            auditLogger.log(contactId, 'LC_Unenrolled',      requestSource, requestId, privacyRequestSfId);
+        }
+        auditLogger.log(contactId, 'Contact_Anonymised', requestSource, requestId, privacyRequestSfId);
 
         // Final audit entry with all systems updated
         Privacy_Audit_Log__c summary = new Privacy_Audit_Log__c(
-            Action__c       = 'DeletionComplete',
+            Privacy_Request__c = privacyRequestSfId,
+            Action__c       = 'Request_Completed',
             Detail__c       = 'Contact: ' + contactId + ' | Source: ' + requestSource + ' | ReqId: ' + requestId + ' | Systems: ' + String.join(systemsUpdated, ';'),
             Performed_At__c = DateTime.now()
         );
         insert summary;
+    }
+
+    /**
+     * @description Looks up or creates the Privacy_Request__c master record for the given request.
+     *              Privacy_Audit_Log__c is a MasterDetail child — every audit log insert requires this ID.
+     */
+    private Id ensurePrivacyRequest(String contactId, String requestId) {
+        List<Privacy_Request__c> existing = [
+            SELECT Id FROM Privacy_Request__c
+            WHERE OneTrust_Request_Id__c = :requestId
+            LIMIT 1
+        ];
+        if (!existing.isEmpty()) return existing[0].Id;
+
+        Privacy_Request__c pr = new Privacy_Request__c(
+            Contact__c             = Id.valueOf(contactId),
+            OneTrust_Request_Id__c = requestId,
+            Status__c              = 'In_Progress',
+            Request_Type__c        = 'Erasure',
+            Requested_At__c        = DateTime.now()
+        );
+        insert pr;
+        return pr.Id;
     }
 
     /**

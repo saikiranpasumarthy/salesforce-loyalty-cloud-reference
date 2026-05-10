@@ -6,14 +6,31 @@ private class LoyaltyEnrollmentControllerTest {
 
     @TestSetup
     static void setup() {
-        Contact c = new Contact(
-            FirstName           = 'Loyalty',
-            LastName            = 'Member',
-            Email               = 'loyalty.member@example.com',
-            Has_Loyalty__c      = true,
-            Loyalty_Member_Id__c = 'MBR-CTRL001'
-        );
-        insert c;
+        List<Contact> contacts = new List<Contact>{
+            // For duplicate-detection test (has loyalty already)
+            new Contact(
+                FirstName            = 'Loyalty',
+                LastName             = 'Member',
+                Email                = 'loyalty.member@example.com',
+                Has_Loyalty__c       = true,
+                Loyalty_Member_Id__c = 'MBR-CTRL001'
+            ),
+            // For testEnrollMember_success — pre-created so matchOrCreateContact finds it without DML
+            new Contact(
+                FirstName = 'Jane',
+                LastName  = 'Doe',
+                Email     = 'jane.doe@example.com',
+                Phone     = '+15551112222'
+            ),
+            // For testEnrollExistingContact_success — a Contact with no loyalty
+            new Contact(
+                FirstName      = 'No',
+                LastName       = 'Loyalty',
+                Email          = 'noloyalty@example.com',
+                Has_Loyalty__c = false
+            )
+        };
+        insert contacts;
     }
 
     @IsTest
@@ -73,12 +90,9 @@ private class LoyaltyEnrollmentControllerTest {
 
     @IsTest
     static void testEnrollExistingContact_success() {
-        Contact c = [SELECT Id FROM Contact WHERE Has_Loyalty__c = false LIMIT 1];
-        if (c == null) {
-            Contact newC = new Contact(FirstName='New', LastName='Contact', Email='newc@example.com');
-            insert newC;
-            c = newC;
-        }
+        List<Contact> contacts = [SELECT Id FROM Contact WHERE Has_Loyalty__c = false LIMIT 1];
+        System.assert(!contacts.isEmpty(), 'Expected a no-loyalty Contact in TestSetup');
+        Contact c = contacts[0];
 
         Test.setMock(HttpCalloutMock.class,
             new LoyaltyMockHttpCallout(200, LoyaltyMockHttpCallout.ENROLLMENT_SUCCESS_BODY));

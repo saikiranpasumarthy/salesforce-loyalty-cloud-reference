@@ -27,8 +27,8 @@ public with sharing class ContactMatchService {
         Contact matched = findBestMatch(dto);
 
         if (matched != null) {
-            updateContactFields(matched, dto);
-            update matched;
+            Boolean changed = updateContactFields(matched, dto);
+            if (changed) update matched;
             return matched.Id;
         }
 
@@ -129,15 +129,19 @@ public with sharing class ContactMatchService {
         return c.Id;
     }
 
-    private void updateContactFields(Contact c, ExternalProfileDTO dto) {
-        if (String.isNotBlank(dto.email)       && c.Email  == null) c.Email  = dto.email.toLowerCase();
-        if (String.isNotBlank(dto.phone)       && c.Phone  == null) c.Phone  = normalizePhone(dto.phone);
+    private Boolean updateContactFields(Contact c, ExternalProfileDTO dto) {
+        Boolean changed = false;
+        if (String.isNotBlank(dto.email)       && c.Email  == null) { c.Email  = dto.email.toLowerCase(); changed = true; }
+        if (String.isNotBlank(dto.phone)       && c.Phone  == null) { c.Phone  = normalizePhone(dto.phone); changed = true; }
         if (String.isNotBlank(dto.countryCode) && c.Country_Code__c == null) {
             c.Country_Code__c = dto.countryCode;
+            changed = true;
         }
         if (String.isNotBlank(dto.epsilonId) && c.Epsilon_Profile_Id__c == null) {
             c.Epsilon_Profile_Id__c = dto.epsilonId;
+            changed = true;
         }
+        return changed;
     }
 
     /**

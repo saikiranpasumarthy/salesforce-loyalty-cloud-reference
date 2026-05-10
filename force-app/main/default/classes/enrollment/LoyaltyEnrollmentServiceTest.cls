@@ -7,24 +7,38 @@ private class LoyaltyEnrollmentServiceTest {
 
     @TestSetup
     static void setup() {
-        // Create a Contact without loyalty for existing-member enrollment tests
-        Contact c = new Contact(
-            FirstName = 'Test',
-            LastName  = 'Member',
-            Email     = 'test.member@example.com',
-            Phone     = '+15551234567'
-        );
-        insert c;
-
-        // Create a Contact with loyalty for duplicate check tests
-        Contact c2 = new Contact(
-            FirstName           = 'Existing',
-            LastName            = 'Loyalty',
-            Email               = 'existing.loyalty@example.com',
-            Has_Loyalty__c      = true,
-            Loyalty_Member_Id__c = 'MBR-EXISTING'
-        );
-        insert c2;
+        List<Contact> contacts = new List<Contact>{
+            // For existing-member enrollment tests
+            new Contact(
+                FirstName = 'Test',
+                LastName  = 'Member',
+                Email     = 'test.member@example.com',
+                Phone     = '+15551234567'
+            ),
+            // For duplicate-detection tests
+            new Contact(
+                FirstName            = 'Existing',
+                LastName             = 'Loyalty',
+                Email                = 'existing.loyalty@example.com',
+                Has_Loyalty__c       = true,
+                Loyalty_Member_Id__c = 'MBR-EXISTING'
+            ),
+            // For testEnrollNewMember_success — pre-created so matchOrCreateContact finds it without DML
+            new Contact(
+                FirstName = 'New',
+                LastName  = 'User',
+                Email     = 'newuser@example.com',
+                Phone     = '+15559876543'
+            ),
+            // For testEnrollNewMember_apiError_propagates
+            new Contact(
+                FirstName = 'Api',
+                LastName  = 'Error',
+                Email     = 'apierror@example.com',
+                Phone     = '+15559876543'
+            )
+        };
+        insert contacts;
     }
 
     @IsTest

@@ -9,20 +9,20 @@ private class RCCCardBatchProcessorTest {
         List<RCC_Import_Record__c> records = new List<RCC_Import_Record__c>{
             new RCC_Import_Record__c(
                 Card_Number__c = 'RCC-001',
-                Status__c      = 'Active',
+                Status__c      = 'Pending',
                 Member_Type__c = 'Retail',
                 Email__c       = 'rcc.test1@example.com'
             ),
             new RCC_Import_Record__c(
                 Card_Number__c = 'RCC-002',
-                Status__c      = 'Active',
+                Status__c      = 'Pending',
                 Member_Type__c = 'Pro',
                 Email__c       = 'rcc.test2@example.com'
             ),
             // Invalid record — no email
             new RCC_Import_Record__c(
                 Card_Number__c = 'RCC-003',
-                Status__c      = 'Active',
+                Status__c      = 'Pending',
                 Member_Type__c = 'Retail'
             )
         };
@@ -65,6 +65,6 @@ private class RCCCardBatchProcessorTest {
 
         List<Batch_Run_Log__c> logs = [SELECT Id, Batch_Type__c FROM Batch_Run_Log__c];
         System.assertEquals(1, logs.size());
-        System.assertEquals('RCCCardBatchProcessor', logs[0].Batch_Type__c);
+        System.assertEquals('RCC_Card_Import', logs[0].Batch_Type__c);
     }
 }

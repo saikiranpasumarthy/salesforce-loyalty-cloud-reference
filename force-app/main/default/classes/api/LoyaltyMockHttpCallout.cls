@@ -18,7 +18,7 @@ public class LoyaltyMockHttpCallout implements HttpCalloutMock {
 
     public static final String ENROLLMENT_SUCCESS_BODY = JSON.serialize(new Map<String, Object>{
         'loyaltyProgramMember' => new Map<String, Object>{
-            'id'               => 'LPM001',
+            'id'               => '001000000000001AAA',
             'membershipNumber' => 'MBR-10001',
             'memberStatus'     => 'Active',
             'currentTierName'  => 'Preferred'

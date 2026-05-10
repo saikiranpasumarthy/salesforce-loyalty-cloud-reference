@@ -18,11 +18,12 @@ public with sharing class PrivacyAuditLogger {
      * @param requestSource External system that initiated the request (OneTrust / SFSC / Agent)
      * @param requestId     OneTrust request UUID for cross-system correlation
      */
-    public void log(String contactId, String action, String requestSource, String requestId) {
+    public void log(String contactId, String action, String requestSource, String requestId, Id privacyRequestSfId) {
         Privacy_Audit_Log__c entry = new Privacy_Audit_Log__c(
-            Action__c       = action,
-            Detail__c       = 'Contact: ' + contactId + ' | Source: ' + requestSource + ' | ReqId: ' + requestId,
-            Performed_At__c = DateTime.now()
+            Privacy_Request__c = privacyRequestSfId,
+            Action__c          = action,
+            Detail__c          = 'Contact: ' + contactId + ' | Source: ' + requestSource + ' | ReqId: ' + requestId,
+            Performed_At__c    = DateTime.now()
         );
         insert entry;
     }
