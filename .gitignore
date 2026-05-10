@@ -1,0 +1,35 @@
+# Salesforce DX
+.sfdx/
+.sf/
+.localdevserver/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build / deploy artifacts
+*.dup
+deploy-errors.txt
+*.log
+
+# Environment
+.env
+.env.*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Keep in repo
+!force-app/
+!sfdx-project.json
+!package.json
+!.forceignore
+!config/
+!docs/

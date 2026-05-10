@@ -1,0 +1,37 @@
+# Salesforce DX .forceignore file
+# https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_exclude_source.htm
+
+# LWC configuration files
+**/jsconfig.json
+**/.eslintrc.json
+
+# LWC Jest test files
+**/__tests__/**
+
+# Scratch org config
+config/
+
+# Node modules
+node_modules/
+
+# IntelliJ project files
+**/.idea
+
+# VS Code workspace
+**/.vscode
+
+# OS-generated files
+**/.DS_Store
+**/Thumbs.db
+
+# Test results
+test-results/
+
+# Coverage reports
+coverage/
+
+# Temporary files
+.sfdx/
+
+# Log files
+*.log

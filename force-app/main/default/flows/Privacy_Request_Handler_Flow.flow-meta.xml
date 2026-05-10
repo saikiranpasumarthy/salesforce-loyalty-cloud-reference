@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <description>Record-triggered flow on Privacy_Request__c. When Status changes to In_Progress, calls PrivacyDeletionController to execute the 4-gate deletion workflow. Updates Status to Completed or Failed based on result.</description>
+    <environments>Default</environments>
+    <interviewLabel>Privacy Request Handler Flow {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Privacy Request Handler Flow</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value><stringValue>LightningFlowBuilder</stringValue></value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>176</locationX>
+        <locationY>48</locationY>
+        <connector>
+            <targetReference>Check_Erasure_Request</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Status__c</field>
+            <operator>EqualTo</operator>
+            <value><stringValue>In_Progress</stringValue></value>
+        </filters>
+        <object>Privacy_Request__c</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+
+    <!-- Only process Erasure and CCPA_Delete types -->
+    <decisions>
+        <name>Check_Erasure_Request</name>
+        <label>Is Erasure or CCPA Delete?</label>
+        <locationX>176</locationX>
+        <locationY>168</locationY>
+        <defaultConnectorLabel>Other Request Type — Skip</defaultConnectorLabel>
+        <rules>
+            <name>Is_Deletion_Request</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Request_Type__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue><stringValue>Erasure</stringValue></rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Request_Type__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue><stringValue>CCPA_Delete</stringValue></rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Execute_Deletion</targetReference>
+            </connector>
+            <label>Erasure or CCPA Delete</label>
+        </rules>
+    </decisions>
+
+    <!-- Invoke Apex deletion service -->
+    <actionCalls>
+        <name>Execute_Deletion</name>
+        <label>Execute Privacy Deletion</label>
+        <locationX>176</locationX>
+        <locationY>288</locationY>
+        <actionName>PrivacyDeletionController</actionName>
+        <actionType>apex</actionType>
+        <connector>
+            <targetReference>Update_Status_Completed</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Update_Status_Failed</targetReference>
+        </faultConnector>
+        <inputParameters>
+            <name>contactId</name>
+            <value>
+                <elementReference>$Record.Contact__c</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>privacyRequestId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+    </actionCalls>
+
+    <!-- Update status on success -->
+    <recordUpdates>
+        <name>Update_Status_Completed</name>
+        <label>Mark Completed</label>
+        <locationX>44</locationX>
+        <locationY>408</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value><elementReference>$Record.Id</elementReference></value>
+        </filters>
+        <inputAssignments>
+            <field>Status__c</field>
+            <value><stringValue>Completed</stringValue></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Completed_At__c</field>
+            <value><elementReference>$Flow.CurrentDateTime</elementReference></value>
+        </inputAssignments>
+        <object>Privacy_Request__c</object>
+    </recordUpdates>
+
+    <!-- Update status on fault -->
+    <recordUpdates>
+        <name>Update_Status_Failed</name>
+        <label>Mark Failed</label>
+        <locationX>308</locationX>
+        <locationY>408</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value><elementReference>$Record.Id</elementReference></value>
+        </filters>
+        <inputAssignments>
+            <field>Status__c</field>
+            <value><stringValue>Failed</stringValue></value>
+        </inputAssignments>
+        <object>Privacy_Request__c</object>
+    </recordUpdates>
+</Flow>

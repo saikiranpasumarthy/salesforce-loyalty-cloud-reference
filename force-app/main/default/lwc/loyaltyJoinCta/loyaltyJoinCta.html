@@ -1,0 +1,22 @@
+<template>
+    <!-- Only renders when the Contact does NOT have loyalty yet -->
+    <template if:false={hasLoyalty}>
+        <div class="slds-box slds-theme_shade slds-text-align_center slds-p-around_medium">
+            <lightning-icon icon-name="utility:loyalty" size="large" class="slds-m-bottom_small"></lightning-icon>
+            <p class="slds-text-heading_small slds-m-bottom_small">Join Our Rewards Program</p>
+            <p class="slds-text-body_regular slds-text-color_weak slds-m-bottom_medium">
+                Earn points on every purchase and unlock exclusive benefits.
+            </p>
+            <lightning-button
+                label={ctaLabel}
+                variant="brand"
+                onclick={handleJoin}
+                disabled={isLoading}
+                icon-name="utility:add"
+            ></lightning-button>
+            <template if:true={errorMessage}>
+                <p class="slds-text-color_error slds-m-top_small">{errorMessage}</p>
+            </template>
+        </div>
+    </template>
+</template>

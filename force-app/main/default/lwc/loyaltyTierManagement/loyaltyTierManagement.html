@@ -1,0 +1,46 @@
+<template>
+    <lightning-card title="Tier Management" icon-name="utility:level_up">
+        <div class="slds-p-around_medium">
+            <template if:true={hasError}>
+                <div class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_small">{errorMessage}</div>
+            </template>
+
+            <lightning-layout vertical-align="center" class="slds-m-bottom_medium">
+                <lightning-layout-item>
+                    <p class="slds-text-body_regular">Current Tier:</p>
+                    <span class={currentTierClass}>{currentTier}</span>
+                </lightning-layout-item>
+            </lightning-layout>
+
+            <lightning-combobox
+                label="Override Tier"
+                value={selectedTier}
+                options={tierOptions}
+                onchange={handleTierChange}
+            ></lightning-combobox>
+
+            <lightning-textarea
+                label="Override Reason (required)"
+                value={overrideReason}
+                required
+                max-length="500"
+                placeholder="Explain why this tier override is necessary"
+                onchange={handleReasonChange}
+                class="slds-m-top_medium"
+            ></lightning-textarea>
+
+            <div class="slds-m-top_medium slds-text-align_right">
+                <lightning-button
+                    label={saveLabel}
+                    variant="brand"
+                    onclick={handleSave}
+                    disabled={isSaveDisabled}
+                ></lightning-button>
+            </div>
+
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Updating tier..."></lightning-spinner>
+            </template>
+        </div>
+    </lightning-card>
+</template>

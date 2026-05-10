@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Assigned to the dedicated integration API user. Grants access to REST resource endpoints (composite lookup, privacy delete, POS lookup) and platform event publishing. No UI access.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Loyalty Integration User</label>
+
+    <classAccesses>
+        <apexClass>LoyaltyCompositeAPIController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>LoyaltyLookupController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>PrivacyDeletionAPIController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+
+    <!-- Contact — read PII fields for composite response; write loyalty IDs -->
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Contact.Has_Loyalty__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Contact.Loyalty_Member_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Contact.Loyalty_Member_Type__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Contact.Country_Code__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Contact.Epsilon_Profile_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+
+    <!-- Privacy Request — create + update (status transitions) -->
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Privacy_Request__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Privacy_Audit_Log__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <!-- System permissions required for REST API access -->
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ApiEnabled</name>
+    </userPermissions>
+
+    <userLicense>Salesforce</userLicense>
+</PermissionSet>

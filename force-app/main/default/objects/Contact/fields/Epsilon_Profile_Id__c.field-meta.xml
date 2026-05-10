@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Epsilon_Profile_Id__c</fullName>
+    <description>Epsilon CRM profile identifier used for cross-system deduplication and profile sync.</description>
+    <externalId>true</externalId>
+    <label>Epsilon Profile ID</label>
+    <length>50</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

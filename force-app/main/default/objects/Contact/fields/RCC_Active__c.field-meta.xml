@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RCC_Active__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>True when the Contact has an active RCC (Retail Centric Card) linked to their loyalty account.</description>
+    <externalId>false</externalId>
+    <label>RCC Active</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

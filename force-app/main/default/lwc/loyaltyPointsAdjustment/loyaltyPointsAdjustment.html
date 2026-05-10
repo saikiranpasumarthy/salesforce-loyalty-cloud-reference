@@ -1,0 +1,89 @@
+<template>
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <h2 class="slds-text-heading_medium">Adjust Points</h2>
+                <button class="slds-button slds-button_icon slds-modal__close" onclick={handleClose}>
+                    <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                </button>
+            </header>
+
+            <div class="slds-modal__content slds-p-around_medium">
+                <!-- Error -->
+                <template if:true={errorMessage}>
+                    <div class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_small">
+                        {errorMessage}
+                    </div>
+                </template>
+
+                <!-- Credit / Debit selector -->
+                <lightning-radio-group
+                    label="Adjustment Type"
+                    options={adjustmentTypeOptions}
+                    value={adjustmentType}
+                    type="button"
+                    onchange={handleTypeChange}
+                ></lightning-radio-group>
+
+                <div class="slds-m-top_medium">
+                    <lightning-input
+                        label="Points Amount"
+                        type="number"
+                        value={amount}
+                        min="1"
+                        step="1"
+                        required
+                        onchange={handleAmount}
+                        message-when-range-underflow="Amount must be at least 1"
+                    ></lightning-input>
+                </div>
+
+                <div class="slds-m-top_medium">
+                    <lightning-combobox
+                        label="Reason"
+                        value={reason}
+                        options={reasonOptions}
+                        required
+                        onchange={handleReason}
+                    ></lightning-combobox>
+                </div>
+
+                <div class="slds-m-top_medium">
+                    <lightning-textarea
+                        label="Agent Notes"
+                        value={notes}
+                        required
+                        max-length="500"
+                        placeholder="Describe the reason for this adjustment (required for audit)"
+                        onchange={handleNotes}
+                    ></lightning-textarea>
+                </div>
+
+                <!-- Confirmation step -->
+                <template if:true={showConfirm}>
+                    <div class="slds-notify slds-notify_alert slds-alert_warning slds-m-top_medium">
+                        Confirm: <strong>{adjustmentType}</strong> <strong>{amount}</strong> points
+                        for reason: <strong>{reason}</strong>
+                    </div>
+                </template>
+            </div>
+
+            <footer class="slds-modal__footer">
+                <lightning-button label="Cancel" onclick={handleClose}></lightning-button>
+                <template if:false={showConfirm}>
+                    <lightning-button label="Review" variant="brand" onclick={handleReview}></lightning-button>
+                </template>
+                <template if:true={showConfirm}>
+                    <lightning-button label="Back" onclick={handleBack}></lightning-button>
+                    <lightning-button
+                        label={submitLabel}
+                        variant="brand"
+                        onclick={handleConfirm}
+                        disabled={isLoading}
+                    ></lightning-button>
+                </template>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>

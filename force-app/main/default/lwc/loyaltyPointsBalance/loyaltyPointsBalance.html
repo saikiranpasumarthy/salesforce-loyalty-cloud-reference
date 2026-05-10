@@ -1,0 +1,36 @@
+<template>
+    <lightning-card title="Points Balance" icon-name="utility:money">
+        <template if:true={isLoading}>
+            <div class="slds-p-around_medium slds-text-align_center">
+                <lightning-spinner alternative-text="Loading..." size="small"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:true={hasError}>
+            <div class="slds-p-around_medium">
+                <lightning-icon icon-name="utility:error" size="x-small" variant="error"></lightning-icon>
+                <span class="slds-m-left_x-small slds-text-color_error">Unable to load points</span>
+                <lightning-button label="Retry" onclick={handleRetry} size="small" class="slds-m-left_small"></lightning-button>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+            <template if:false={hasError}>
+                <div class="slds-p-around_medium">
+                    <div class="slds-text-heading_large slds-text-align_center">{formattedBalance}</div>
+                    <div class="slds-text-body_small slds-text-color_weak slds-text-align_center">
+                        {currencyName}
+                    </div>
+                    <template if:true={showExpiry}>
+                        <div class="slds-m-top_small slds-text-align_center">
+                            <span class={expiryClass}>Expires: {expiryDateFormatted}</span>
+                        </div>
+                    </template>
+                    <div class="slds-text-body_small slds-text-color_weak slds-text-align_center slds-m-top_x-small">
+                        Updated {lastRefreshedFormatted}
+                    </div>
+                </div>
+            </template>
+        </template>
+    </lightning-card>
+</template>

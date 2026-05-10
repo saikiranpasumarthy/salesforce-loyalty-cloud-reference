@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Maps legacy tier codes from external systems (Epsilon, RCC, historical exports) to canonical Salesforce Loyalty Cloud tier names. Queried by TierMappingService.</description>
+    <label>Tier Mapping</label>
+    <pluralLabel>Tier Mappings</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

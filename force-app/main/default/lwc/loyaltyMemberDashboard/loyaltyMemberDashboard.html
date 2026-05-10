@@ -1,0 +1,101 @@
+<template>
+    <lightning-card title="Loyalty Member" icon-name="standard:loyalty_program">
+        <!-- Loading state -->
+        <template if:true={isLoading}>
+            <div class="slds-p-around_medium slds-text-align_center">
+                <lightning-spinner alternative-text="Loading loyalty data..."></lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Error state -->
+        <template if:true={hasError}>
+            <div class="slds-p-around_medium">
+                <div class="slds-notify slds-notify_alert slds-alert_error">
+                    {errorMessage}
+                    <lightning-button label="Retry" onclick={handleRefresh} class="slds-m-left_small"></lightning-button>
+                </div>
+            </div>
+        </template>
+
+        <!-- No loyalty state -->
+        <template if:true={hasNoLoyalty}>
+            <div class="slds-p-around_medium slds-text-align_center">
+                <p class="slds-text-body_regular slds-text-color_weak">This contact is not enrolled in the loyalty program.</p>
+            </div>
+        </template>
+
+        <!-- Member dashboard -->
+        <template if:true={hasMemberData}>
+            <div class="slds-p-around_medium">
+                <!-- Tier badge + member type -->
+                <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_medium">
+                    <div class="slds-col">
+                        <span class={tierBadgeClass}>{tier}</span>
+                        <span class="slds-m-left_small slds-badge">{memberType}</span>
+                    </div>
+                    <div class="slds-col slds-text-align_right slds-text-body_small slds-text-color_weak">
+                        ID: {loyaltyId}
+                    </div>
+                </div>
+
+                <!-- Points balance -->
+                <div class="slds-grid slds-m-bottom_medium">
+                    <div class="slds-col">
+                        <p class="slds-text-heading_large">{pointsBalance}</p>
+                        <p class="slds-text-body_small slds-text-color_weak">Reward Points</p>
+                    </div>
+                    <div class="slds-col slds-text-align_right">
+                        <p class="slds-text-body_small">{pointsToNextTier} pts to {nextTierName}</p>
+                    </div>
+                </div>
+
+                <!-- Progress bar to next tier -->
+                <div class="slds-m-bottom_medium">
+                    <lightning-progress-bar value={tierProgress} size="large" variant="base"></lightning-progress-bar>
+                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_x-small">
+                        Progress to {nextTierName}
+                    </p>
+                </div>
+
+                <!-- Quick action buttons -->
+                <div class="slds-button-group slds-m-top_small">
+                    <lightning-button
+                        label="Adjust Points"
+                        onclick={handleAdjustPoints}
+                        icon-name="utility:change_record_type"
+                    ></lightning-button>
+                    <lightning-button
+                        label="View History"
+                        onclick={handleViewHistory}
+                        icon-name="utility:list"
+                    ></lightning-button>
+                    <lightning-button
+                        label="Refresh"
+                        onclick={handleRefresh}
+                        icon-name="utility:refresh"
+                    ></lightning-button>
+                    <lightning-button
+                        label="Unenroll"
+                        onclick={handleUnenroll}
+                        icon-name="utility:delete"
+                        variant="destructive-text"
+                    ></lightning-button>
+                </div>
+
+                <!-- Last refreshed timestamp -->
+                <p class="slds-text-body_small slds-text-color_weak slds-m-top_small">
+                    Last updated: {lastRefreshed}
+                </p>
+            </div>
+        </template>
+    </lightning-card>
+
+    <!-- Points Adjustment Modal -->
+    <template if:true={showAdjustModal}>
+        <c-loyalty-points-adjustment
+            lpm-id={lpmId}
+            onclose={handleAdjustClose}
+            onadjusted={handleAdjusted}
+        ></c-loyalty-points-adjustment>
+    </template>
+</template>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Program_Config__c</fullName>
+    <description>Links this exclusion rule to a specific Loyalty_Program_Config__mdt record.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Program Config</label>
+    <referenceTo>Loyalty_Program_Config__mdt</referenceTo>
+    <relationshipLabel>Exclusion Rules</relationshipLabel>
+    <relationshipName>Exclusion_Rules</relationshipName>
+    <required>false</required>
+    <type>MetadataRelationship</type>
+</CustomField>

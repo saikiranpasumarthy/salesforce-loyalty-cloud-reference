@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Stores per-loyalty-program configuration: API program name, currency, enrollment limits. Queried by LoyaltyEnrollmentService and LoyaltyAPIClient.</description>
+    <label>Loyalty Program Config</label>
+    <pluralLabel>Loyalty Program Configs</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>
