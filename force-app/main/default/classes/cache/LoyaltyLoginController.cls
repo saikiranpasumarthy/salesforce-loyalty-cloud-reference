@@ -51,6 +51,35 @@ public with sharing class LoyaltyLoginController {
         }
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Invocable method for RCC_LPM_Attribute_Update_Flow
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public class SyncRequest {
+        @InvocableVariable(required=true label='Contact Id')
+        public Id contactId;
+    }
+
+    /**
+     * @description Refreshes the Platform Cache for a Contact after loyalty attributes change.
+     *              Called from RCC_LPM_Attribute_Update_Flow when Has_Loyalty__c or Loyalty_Member_Type__c changes.
+     */
+    @InvocableMethod(
+        label='Sync Member Attributes'
+        description='Refreshes the loyalty session cache after a Contact loyalty attribute change.'
+    )
+    public static void syncMemberAttributes(List<SyncRequest> requests) {
+        LoyaltySessionCacheService svc = new LoyaltySessionCacheService();
+        for (SyncRequest req : requests) {
+            try {
+                svc.refreshMemberData(req.contactId);
+            } catch (Exception e) {
+                System.debug(LoggingLevel.WARN,
+                    'syncMemberAttributes failed for contact ' + req.contactId + ': ' + e.getMessage());
+            }
+        }
+    }
+
     /**
      * @description Forces a cache refresh for the given Contact.
      *              Called by agent after making changes (tier override, point adjustment).

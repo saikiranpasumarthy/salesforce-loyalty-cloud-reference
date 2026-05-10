@@ -20,7 +20,7 @@
         <object>Loyalty_Enrollment_Event__e</object>
         <triggerType>PlatformEvent</triggerType>
     </start>
-    <status>Active</status>
+    <status>Draft</status>
 
     <!-- Get Contact record for email address and first name -->
     <recordLookups>
@@ -50,9 +50,6 @@
             <assignToReference>varContactFirstName</assignToReference>
             <field>FirstName</field>
         </outputAssignments>
-        <queriedFields>Id</queriedFields>
-        <queriedFields>Email</queriedFields>
-        <queriedFields>FirstName</queriedFields>
     </recordLookups>
 
     <!-- Only send if contact has an email -->

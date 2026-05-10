@@ -70,5 +70,4 @@
         <name>ApiEnabled</name>
     </userPermissions>
 
-    <userLicense>Salesforce</userLicense>
 </PermissionSet>

@@ -31,7 +31,7 @@
         <recordTriggerType>Update</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
     </start>
-    <status>Active</status>
+    <status>Draft</status>
 
     <!-- Only proceed if the Contact has a Loyalty Member ID to sync to -->
     <decisions>
@@ -68,9 +68,6 @@
         <locationY>288</locationY>
         <actionName>LoyaltyLoginController</actionName>
         <actionType>apex</actionType>
-        <faultConnector>
-            <targetReference>Log_Sync_Error</targetReference>
-        </faultConnector>
         <inputParameters>
             <name>contactId</name>
             <value>
@@ -79,19 +76,4 @@
         </inputParameters>
     </actionCalls>
 
-    <!-- Log error to debug log — do not fail the Contact save -->
-    <actionCalls>
-        <name>Log_Sync_Error</name>
-        <label>Log Sync Error</label>
-        <locationX>308</locationX>
-        <locationY>408</locationY>
-        <actionName>logError</actionName>
-        <actionType>apex</actionType>
-        <inputParameters>
-            <name>message</name>
-            <value>
-                <stringValue>RCC_LPM_Attribute_Update_Flow: failed to sync member attributes for Contact {!$Record.Id}: {!$Flow.FaultMessage}</stringValue>
-            </value>
-        </inputParameters>
-    </actionCalls>
 </Flow>

@@ -26,7 +26,7 @@
         <recordTriggerType>Update</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
     </start>
-    <status>Active</status>
+    <status>Draft</status>
 
     <!-- Only process Erasure and CCPA_Delete types -->
     <decisions>
