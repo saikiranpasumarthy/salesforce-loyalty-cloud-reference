@@ -69,16 +69,18 @@ global with sharing class LoyaltyLookupController {
         String normalizedPhone = String.isNotBlank(phone)
             ? phone.replaceAll('[^0-9]', '')
             : null;
+        String phoneSearch = normalizedPhone != null
+            ? '%' + normalizedPhone.right(10) + '%'
+            : '%NOMATCH%';
 
         List<Contact> contacts = [
             SELECT Id, FirstName, LastName, Has_Loyalty__c, Loyalty_Member_Id__c,
                    Loyalty_Member_Type__c, Country_Code__c, RCC_Active__c, RCC_Card_Number__c
             FROM   Contact
-            WHERE  (Email = :email              AND :email != null)
-               OR  (Phone LIKE :('%' + (normalizedPhone != null ? normalizedPhone.right(10) : 'NOMATCH') + '%')
-                    AND :normalizedPhone != null)
-               OR  (Loyalty_Member_Id__c = :loyaltyId AND :loyaltyId != null)
-               OR  (RCC_Card_Number__c = :cardNumber   AND :cardNumber != null)
+            WHERE  (Email = :email                              AND :email != null)
+               OR  (Phone LIKE :phoneSearch                    AND :normalizedPhone != null)
+               OR  (Loyalty_Member_Id__c = :loyaltyId          AND :loyaltyId != null)
+               OR  (RCC_Card_Number__c = :cardNumber            AND :cardNumber != null)
             LIMIT  1
         ];
         return contacts.isEmpty() ? null : contacts[0];

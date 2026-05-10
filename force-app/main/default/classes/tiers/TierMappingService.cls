@@ -33,7 +33,7 @@ public with sharing class TierMappingService {
      * @return                TierResult with tier and memberType, or Preferred/Retail as default
      */
     public TierResult mapLegacyTier(String legacyTierCode) {
-        Map<String, Tier_Mapping__mdt> map = getTierMap();
+        Map<String, Tier_Mapping__mdt> tiers = getTierMap();
 
         TierResult result = new TierResult();
         result.tier       = 'Preferred'; // safe default
@@ -41,9 +41,9 @@ public with sharing class TierMappingService {
 
         if (String.isBlank(legacyTierCode)) return result;
 
-        Tier_Mapping__mdt mapping = map.get(legacyTierCode.trim());
+        Tier_Mapping__mdt mapping = tiers.get(legacyTierCode.trim());
         if (mapping != null) {
-            result.tier       = mapping.New_Tier__c;
+            result.tier       = mapping.Canonical_Tier__c;
             result.memberType = mapping.Member_Type__c;
         }
 
@@ -60,8 +60,8 @@ public with sharing class TierMappingService {
      */
     public String getDownstreamGroupCode(String tier, String memberType) {
         for (Tier_Mapping__mdt mapping : getTierMap().values()) {
-            if (mapping.New_Tier__c == tier && mapping.Member_Type__c == memberType) {
-                return mapping.Downstream_Group_Code__c;
+            if (mapping.Canonical_Tier__c == tier && mapping.Member_Type__c == memberType) {
+                return mapping.Legacy_Code__c;
             }
         }
         return 'Base'; // fallback
@@ -80,8 +80,7 @@ public with sharing class TierMappingService {
         if (tierMap == null) {
             tierMap = new Map<String, Tier_Mapping__mdt>();
             for (Tier_Mapping__mdt m : [
-                SELECT DeveloperName, Legacy_Code__c, New_Tier__c,
-                       Member_Type__c, Downstream_Group_Code__c
+                SELECT DeveloperName, Legacy_Code__c, Canonical_Tier__c, Member_Type__c
                 FROM   Tier_Mapping__mdt
             ]) {
                 tierMap.put(m.Legacy_Code__c, m);

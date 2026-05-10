@@ -37,10 +37,10 @@ public with sharing class LoyaltyEnrollmentController {
 
             // Program name loaded from CMDT inside the service
             Loyalty_Program_Config__mdt cfg = [
-                SELECT Program_Name__c FROM Loyalty_Program_Config__mdt
+                SELECT Program_API_Name__c FROM Loyalty_Program_Config__mdt
                 WHERE DeveloperName = 'Default' LIMIT 1
             ];
-            req.programName = cfg.Program_Name__c;
+            req.programName = cfg.Program_API_Name__c;
 
             LoyaltyEnrollmentService svc = new LoyaltyEnrollmentService();
             return svc.enrollNewMember(req);

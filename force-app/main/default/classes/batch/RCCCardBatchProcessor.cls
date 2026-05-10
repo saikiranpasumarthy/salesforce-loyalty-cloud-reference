@@ -41,12 +41,11 @@ public with sharing class RCCCardBatchProcessor
     public Database.QueryLocator start(Database.BatchableContext bc) {
         batchRunId = bc.getJobId();
         return Database.getQueryLocator([
-            SELECT Id, Card_Number__c, Card_Status__c, Card_Type__c,
-                   Email__c, Phone__c, First_Name__c, Last_Name__c,
-                   Processing_Status__c, Import_Date__c
+            SELECT Id, Card_Number__c, Email__c, Member_Type__c,
+                   Status__c, Error_Message__c, Batch_Job_Id__c
             FROM   RCC_Import_Record__c
-            WHERE  Processing_Status__c = 'Pending'
-            ORDER  BY Import_Date__c ASC
+            WHERE  Status__c = 'Pending'
+            ORDER  BY CreatedDate ASC
         ]);
     }
 
@@ -72,9 +71,6 @@ public with sharing class RCCCardBatchProcessor
                 // Match or create Contact
                 ExternalProfileDTO dto = new ExternalProfileDTO();
                 dto.email        = rec.Email__c;
-                dto.phone        = rec.Phone__c;
-                dto.firstName    = rec.First_Name__c;
-                dto.lastName     = rec.Last_Name__c;
                 dto.rccCardNumber = rec.Card_Number__c;
                 dto.sourceSystem = 'RCC_BATCH';
 
@@ -83,7 +79,7 @@ public with sharing class RCCCardBatchProcessor
                 // Enroll or update LPM
                 Contact c = [SELECT Id, Has_Loyalty__c, Loyalty_Member_Id__c FROM Contact WHERE Id = :contactId LIMIT 1];
                 if (!c.Has_Loyalty__c) {
-                    EnrollmentRequest req = enrollSvc.buildEnrollmentRequest(c, rec.Card_Type__c == 'Pro' ? 'Pro' : 'Retail');
+                    EnrollmentRequest req = enrollSvc.buildEnrollmentRequest(c, rec.Member_Type__c == 'Pro' ? 'Pro' : 'Retail');
                     req.programName = getProgramName();
                     enrollSvc.enrollNewMember(req);
                 }
@@ -91,7 +87,7 @@ public with sharing class RCCCardBatchProcessor
                 // Update Contact RCC fields
                 Contact toUpdateContact = new Contact(
                     Id               = contactId,
-                    RCC_Active__c    = rec.Card_Status__c == 'Active',
+                    RCC_Active__c    = rec.Status__c == 'Active',
                     RCC_Card_Number__c = rec.Card_Number__c
                 );
                 contacts.add(toUpdateContact);
@@ -114,12 +110,13 @@ public with sharing class RCCCardBatchProcessor
     public void finish(Database.BatchableContext bc) {
         // Log batch run summary
         Batch_Run_Log__c log = new Batch_Run_Log__c(
-            Batch_Name__c    = 'RCCCardBatchProcessor',
-            Run_Date__c      = DateTime.now(),
-            Total_Records__c = stats.totalProcessed,
-            Succeeded__c     = stats.succeeded,
-            Failed__c        = stats.failed,
-            Error_Log__c     = stats.errors.isEmpty() ? null : String.join(stats.errors, '\n').left(131072)
+            Batch_Type__c      = 'RCCCardBatchProcessor',
+            Completed_At__c    = DateTime.now(),
+            Total_Processed__c = stats.totalProcessed,
+            Total_Succeeded__c = stats.succeeded,
+            Total_Failed__c    = stats.failed,
+            Error_Summary__c   = stats.errors.isEmpty() ? null : String.join(stats.errors, '\n').left(131072),
+            Apex_Job_Id__c     = batchRunId
         );
         insert log;
 
@@ -141,19 +138,19 @@ public with sharing class RCCCardBatchProcessor
     // ─────────────────────────────────────────────────────────────────────────
 
     private void markProcessed(RCC_Import_Record__c rec) {
-        rec.Processing_Status__c = 'Processed';
-        rec.Error_Message__c     = null;
-        rec.Batch_Run_Id__c      = batchRunId;
+        rec.Status__c        = 'Processed';
+        rec.Error_Message__c = null;
+        rec.Batch_Job_Id__c  = batchRunId;
     }
 
     private void markFailed(RCC_Import_Record__c rec, String errorMsg) {
-        rec.Processing_Status__c = 'Failed';
-        rec.Error_Message__c     = errorMsg?.left(255);
-        rec.Batch_Run_Id__c      = batchRunId;
+        rec.Status__c        = 'Failed';
+        rec.Error_Message__c = errorMsg?.left(255);
+        rec.Batch_Job_Id__c  = batchRunId;
     }
 
     private String getProgramName() {
-        return [SELECT Program_Name__c FROM Loyalty_Program_Config__mdt
-                WHERE DeveloperName = 'Default' LIMIT 1].Program_Name__c;
+        return [SELECT Program_API_Name__c FROM Loyalty_Program_Config__mdt
+                WHERE DeveloperName = 'Default' LIMIT 1].Program_API_Name__c;
     }
 }

@@ -20,12 +20,9 @@ public with sharing class PrivacyAuditLogger {
      */
     public void log(String contactId, String action, String requestSource, String requestId) {
         Privacy_Audit_Log__c entry = new Privacy_Audit_Log__c(
-            Contact_Id__c     = contactId,
-            Action__c         = action,
-            Request_Source__c = requestSource,
-            Request_Id__c     = requestId,
-            Timestamp__c      = DateTime.now(),
-            Handled_By__c     = UserInfo.getUserId()
+            Action__c       = action,
+            Detail__c       = 'Contact: ' + contactId + ' | Source: ' + requestSource + ' | ReqId: ' + requestId,
+            Performed_At__c = DateTime.now()
         );
         insert entry;
     }
@@ -42,12 +39,14 @@ public with sharing class PrivacyAuditLogger {
      *              Used by privacy admin screens to show a member's deletion history.
      */
     public List<Privacy_Audit_Log__c> getAuditTrail(String contactId) {
+        Id cId = Id.valueOf(contactId);
         return [
-            SELECT Id, Action__c, Request_Source__c, Request_Id__c,
-                   Timestamp__c, Systems_Updated__c, Handled_By__c
+            SELECT Id, Action__c, Detail__c, Performed_At__c
             FROM   Privacy_Audit_Log__c
-            WHERE  Contact_Id__c = :contactId
-            ORDER  BY Timestamp__c DESC
+            WHERE  Privacy_Request__c IN (
+                SELECT Id FROM Privacy_Request__c WHERE Contact__c = :cId
+            )
+            ORDER  BY Performed_At__c DESC
         ];
     }
 }

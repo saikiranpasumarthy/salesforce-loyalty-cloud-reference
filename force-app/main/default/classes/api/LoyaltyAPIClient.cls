@@ -26,11 +26,9 @@ public with sharing class LoyaltyAPIClient {
 
     public LoyaltyAPIClient() {
         Loyalty_Program_Config__mdt cfg = getConfig();
-        this.baseUrl     = cfg.Base_URL__c;
-        this.programName = cfg.Program_Name__c;
-        this.timeoutMs   = cfg.API_Timeout_Ms__c != null
-                           ? Integer.valueOf(cfg.API_Timeout_Ms__c)
-                           : DEFAULT_TIMEOUT_MS;
+        this.baseUrl     = '';
+        this.programName = cfg.Program_API_Name__c;
+        this.timeoutMs   = DEFAULT_TIMEOUT_MS;
     }
 
     /**
@@ -161,9 +159,7 @@ public with sharing class LoyaltyAPIClient {
     private static Loyalty_Program_Config__mdt getConfig() {
         if (cachedConfig == null) {
             cachedConfig = [
-                SELECT Program_Name__c, Base_URL__c, API_Version__c,
-                       API_Timeout_Ms__c, Default_Currency__c,
-                       Preferred_Tier_Threshold__c, Elite_Tier_Threshold__c
+                SELECT Program_API_Name__c, Currency_ISO_Code__c, Is_Active__c
                 FROM   Loyalty_Program_Config__mdt
                 WHERE  DeveloperName = 'Default'
                 LIMIT  1

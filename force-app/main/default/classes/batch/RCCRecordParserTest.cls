@@ -13,12 +13,9 @@ private class RCCRecordParserTest {
         Test.stopTest();
 
         System.assertEquals('RCC-001',          rec.Card_Number__c);
-        System.assertEquals('Active',           rec.Card_Status__c);
-        System.assertEquals('Retail',           rec.Card_Type__c);
+        System.assertEquals('Active',           rec.Status__c);
+        System.assertEquals('Retail',           rec.Member_Type__c);
         System.assertEquals('test@example.com', rec.Email__c);
-        System.assertEquals('John',             rec.First_Name__c);
-        System.assertEquals('Doe',              rec.Last_Name__c);
-        System.assertEquals('Pending',          rec.Processing_Status__c);
     }
 
     @IsTest
@@ -61,9 +58,8 @@ private class RCCRecordParserTest {
     static void testValidateRecord_valid() {
         RCC_Import_Record__c rec = new RCC_Import_Record__c(
             Card_Number__c = 'RCC-001',
-            Card_Status__c = 'Active',
-            Email__c       = 'valid@example.com',
-            Last_Name__c   = 'Smith'
+            Status__c      = 'Active',
+            Email__c       = 'valid@example.com'
         );
 
         Test.startTest();
@@ -77,9 +73,8 @@ private class RCCRecordParserTest {
     @IsTest
     static void testValidateRecord_missingCardNumber() {
         RCC_Import_Record__c rec = new RCC_Import_Record__c(
-            Card_Status__c = 'Active',
-            Email__c       = 'test@example.com',
-            Last_Name__c   = 'Smith'
+            Status__c = 'Active',
+            Email__c  = 'test@example.com'
         );
 
         Test.startTest();
@@ -94,9 +89,8 @@ private class RCCRecordParserTest {
     static void testValidateRecord_invalidStatus() {
         RCC_Import_Record__c rec = new RCC_Import_Record__c(
             Card_Number__c = 'RCC-001',
-            Card_Status__c = 'Unknown',
-            Email__c       = 'test@example.com',
-            Last_Name__c   = 'Smith'
+            Status__c      = 'Unknown',
+            Email__c       = 'test@example.com'
         );
 
         Test.startTest();
@@ -108,11 +102,10 @@ private class RCCRecordParserTest {
     }
 
     @IsTest
-    static void testValidateRecord_noEmailOrPhone() {
+    static void testValidateRecord_noEmail() {
         RCC_Import_Record__c rec = new RCC_Import_Record__c(
             Card_Number__c = 'RCC-001',
-            Card_Status__c = 'Active',
-            Last_Name__c   = 'Smith'
+            Status__c      = 'Active'
         );
 
         Test.startTest();
@@ -120,6 +113,6 @@ private class RCCRecordParserTest {
         Test.stopTest();
 
         System.assertEquals(false, result.isValid);
-        System.assert(result.errorMessage.containsIgnoreCase('Email or Phone'));
+        System.assert(result.errorMessage.containsIgnoreCase('Email'));
     }
 }

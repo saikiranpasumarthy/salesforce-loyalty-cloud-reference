@@ -40,7 +40,8 @@ public with sharing class LoyaltySessionCacheService {
 
         // Try cache first
         if (isCacheAvailable()) {
-            MemberSessionData cached = (MemberSessionData) Cache.Org.get(CACHE_PARTITION, cacheKey);
+            Cache.OrgPartition partition = Cache.Org.getPartition(CACHE_PARTITION);
+            MemberSessionData cached = (MemberSessionData) partition.get(cacheKey);
             if (cached != null && !cached.isStale(30)) {
                 return cached;
             }
@@ -95,7 +96,8 @@ public with sharing class LoyaltySessionCacheService {
 
         // Store in cache
         if (isCacheAvailable()) {
-            Cache.Org.put(CACHE_PARTITION, buildKey(contactId), data, TTL_SECONDS);
+            Cache.OrgPartition partition = Cache.Org.getPartition(CACHE_PARTITION);
+            partition.put(buildKey(contactId), data, TTL_SECONDS);
         }
 
         return data;
@@ -107,7 +109,8 @@ public with sharing class LoyaltySessionCacheService {
      */
     public void clearMemberData(Id contactId) {
         if (isCacheAvailable()) {
-            Cache.Org.remove(CACHE_PARTITION, buildKey(contactId));
+            Cache.OrgPartition partition = Cache.Org.getPartition(CACHE_PARTITION);
+            partition.remove(buildKey(contactId));
         }
     }
 

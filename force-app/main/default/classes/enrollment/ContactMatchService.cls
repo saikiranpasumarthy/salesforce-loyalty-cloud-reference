@@ -95,7 +95,7 @@ public with sharing class ContactMatchService {
 
         // Return the first match in priority order
         for (Contact c : candidates) {
-            if (email != null && email == c.Email?.toLowerCase()) return c; // email match wins
+            if (email != null && email == (c.Email != null ? c.Email.toLowerCase() : null)) return c; // email match wins
         }
         for (Contact c : candidates) {
             if (phone != null && phone == c.Phone) return c;

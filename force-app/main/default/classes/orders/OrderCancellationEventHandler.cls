@@ -45,13 +45,13 @@ public with sharing class OrderCancellationEventHandler {
     }
 
     private void processEvent(Order_Cancellation_Event__e evt) {
-        if (String.isBlank(evt.LPM_Id__c)) return;
+        if (String.isBlank(evt.Loyalty_Member_Id__c)) return;
 
         List<String> errors = new List<String>();
 
         // Step 1: Cancel redeemed vouchers
-        if (String.isNotBlank(evt.Voucher_Codes_JSON__c)) {
-            List<String> codes = parseVoucherCodes(evt.Voucher_Codes_JSON__c);
+        if (String.isNotBlank(evt.Voucher_Ids_JSON__c)) {
+            List<String> codes = parseVoucherCodes(evt.Voucher_Ids_JSON__c);
             for (String code : codes) {
                 try {
                     voucherService.cancelVoucher(code, 'ORDER_CANCELLED');
@@ -64,12 +64,12 @@ public with sharing class OrderCancellationEventHandler {
         // Step 2: Reverse awarded points
         if (evt.Points_To_Reverse__c != null && evt.Points_To_Reverse__c > 0) {
             String currency = [
-                SELECT Default_Currency__c FROM Loyalty_Program_Config__mdt
+                SELECT Currency_ISO_Code__c FROM Loyalty_Program_Config__mdt
                 WHERE DeveloperName = 'Default' LIMIT 1
-            ].Default_Currency__c;
+            ].Currency_ISO_Code__c;
 
             txnService.debitPoints(
-                evt.LPM_Id__c,
+                evt.Loyalty_Member_Id__c,
                 evt.Points_To_Reverse__c,
                 currency,
                 'ORDER_CANCELLED:' + evt.Order_Id__c

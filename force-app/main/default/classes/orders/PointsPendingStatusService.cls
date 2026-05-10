@@ -17,7 +17,6 @@ public with sharing class PointsPendingStatusService {
         // Upsert to avoid duplicates if called multiple times for the same order
         Order_Points_Status__c status = new Order_Points_Status__c(
             Order_Id__c   = orderId,
-            LPM_Id__c     = lpmId,
             Status__c     = 'Pending'
         );
 
@@ -39,8 +38,7 @@ public with sharing class PointsPendingStatusService {
         ];
         if (records.isEmpty()) return;
 
-        records[0].Status__c                 = 'Awarded';
-        records[0].Transaction_Journal_Id__c = txnJournalId;
+        records[0].Status__c = 'Awarded';
         update records[0];
     }
 

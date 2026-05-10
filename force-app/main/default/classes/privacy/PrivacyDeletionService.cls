@@ -83,13 +83,9 @@ public without sharing class PrivacyDeletionService {
 
         // Final audit entry with all systems updated
         Privacy_Audit_Log__c summary = new Privacy_Audit_Log__c(
-            Contact_Id__c     = contactId,
-            Action__c         = 'DeletionComplete',
-            Request_Source__c = requestSource,
-            Request_Id__c     = requestId,
-            Systems_Updated__c = String.join(systemsUpdated, ';'),
-            Timestamp__c      = DateTime.now(),
-            Handled_By__c     = UserInfo.getUserId()
+            Action__c       = 'DeletionComplete',
+            Detail__c       = 'Contact: ' + contactId + ' | Source: ' + requestSource + ' | ReqId: ' + requestId + ' | Systems: ' + String.join(systemsUpdated, ';'),
+            Performed_At__c = DateTime.now()
         );
         insert summary;
     }
@@ -153,7 +149,7 @@ public without sharing class PrivacyDeletionService {
         List<Order_Points_Status__c> records = [
             SELECT Id, CreatedDate
             FROM   Order_Points_Status__c
-            WHERE  LPM_Id__c = :lpmId
+            WHERE  Contact__c IN (SELECT Id FROM Contact WHERE Loyalty_Member_Id__c = :lpmId)
             AND    Status__c = 'Awarded'
             ORDER  BY CreatedDate DESC
             LIMIT  1

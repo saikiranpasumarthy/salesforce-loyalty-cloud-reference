@@ -14,7 +14,7 @@
  *   }
  */
 @SuppressWarnings('PMD.AvoidGlobalModifier')
-public with sharing class LoyaltyAPIException extends Exception {
+public virtual with sharing class LoyaltyAPIException extends Exception {
 
     /** HTTP status code returned by the Loyalty Cloud API, if applicable. */
     public Integer statusCode { get; private set; }

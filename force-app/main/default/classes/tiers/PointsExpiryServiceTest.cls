@@ -41,9 +41,10 @@ private class PointsExpiryServiceTest {
         insert usRecentContact;
 
         // Create recent order status for the recent purchaser
+        Contact recentContactForOrder = [SELECT Id FROM Contact WHERE Email = 'us.recent@example.com' LIMIT 1];
         Order_Points_Status__c recentOrder = new Order_Points_Status__c(
             Order_Id__c  = 'ORD-RECENT-001',
-            LPM_Id__c    = 'LPM-US-RECENT',
+            Contact__c   = recentContactForOrder.Id,
             Status__c    = 'Awarded'
         );
         insert recentOrder;

@@ -56,28 +56,26 @@ public with sharing class OrderFulfilmentEventHandler {
     }
 
     private void processEvent(Order_Fulfilment_Event__e evt) {
-        if (String.isBlank(evt.LPM_Id__c)) return; // non-loyalty order — skip
+        if (String.isBlank(evt.Loyalty_Member_Id__c)) return; // non-loyalty order — skip
 
         // Parse line items from JSON payload
-        List<CartLineItem> lineItems = parseLineItems(evt.Line_Items_JSON__c);
+        List<CartLineItem> lineItems = parseLineItems(evt.Cart_Lines_JSON__c);
 
         // Assemble TJ DTO
         TransactionJournalDTO dto = new TransactionJournalDTO();
-        dto.lpmId           = evt.LPM_Id__c;
+        dto.lpmId           = evt.Loyalty_Member_Id__c;
         dto.orderId         = evt.Order_Id__c;
         dto.journalTypeName = 'Purchase';
-        dto.activityDate    = evt.Transaction_Date__c != null
-                              ? String.valueOf(evt.Transaction_Date__c.date())
+        dto.activityDate    = evt.Order_Date__c != null
+                              ? String.valueOf(evt.Order_Date__c.date())
                               : String.valueOf(Date.today());
-        dto.fulfilmentType  = evt.Fulfilment_Type__c;
-        dto.tenderType      = evt.Tender_Type__c;
         dto.lineItems       = lineItems;
 
         // Load currency from config
         dto.currencyName = [
-            SELECT Default_Currency__c FROM Loyalty_Program_Config__mdt
+            SELECT Currency_ISO_Code__c FROM Loyalty_Program_Config__mdt
             WHERE DeveloperName = 'Default' LIMIT 1
-        ].Default_Currency__c;
+        ].Currency_ISO_Code__c;
 
         // Execute transaction in LC
         Map<String, Object> txnResp = txnService.executeTransaction(dto);

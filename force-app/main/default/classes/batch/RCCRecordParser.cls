@@ -31,20 +31,15 @@ public with sharing class RCCRecordParser {
         }
 
         List<String> cols = splitCsvRow(csvRow);
-        if (cols.size() < 7) {
+        if (cols.size() < 4) {
             throw new IllegalArgumentException('CSV row has insufficient columns: ' + cols.size());
         }
 
         RCC_Import_Record__c rec = new RCC_Import_Record__c();
-        rec.Card_Number__c         = cols[0].trim();
-        rec.Card_Status__c         = cols[1].trim();   // Active | Inactive | Cancelled
-        rec.Card_Type__c           = cols[2].trim();   // Retail | Pro
-        rec.Email__c               = cols[3].trim().toLowerCase();
-        rec.Phone__c               = cols[4].trim();
-        rec.First_Name__c          = cols[5].trim();
-        rec.Last_Name__c           = cols[6].trim();
-        rec.Processing_Status__c   = 'Pending';
-        rec.Import_Date__c         = DateTime.now();
+        rec.Card_Number__c  = cols[0].trim();
+        rec.Status__c       = cols[1].trim();   // Active | Inactive | Cancelled
+        rec.Member_Type__c  = cols[2].trim();   // Retail | Pro
+        rec.Email__c        = cols[3].trim().toLowerCase();
 
         return rec;
     }
@@ -57,17 +52,16 @@ public with sharing class RCCRecordParser {
         List<String> issues = new List<String>();
 
         if (String.isBlank(rec.Card_Number__c)) issues.add('Card number is blank');
-        if (String.isBlank(rec.Card_Status__c)) issues.add('Card status is blank');
-        if (!new Set<String>{'Active','Inactive','Cancelled'}.contains(rec.Card_Status__c)) {
-            issues.add('Invalid card status: ' + rec.Card_Status__c);
+        if (String.isBlank(rec.Status__c)) issues.add('Card status is blank');
+        if (!new Set<String>{'Active','Inactive','Cancelled'}.contains(rec.Status__c)) {
+            issues.add('Invalid card status: ' + rec.Status__c);
         }
-        if (String.isBlank(rec.Email__c) && String.isBlank(rec.Phone__c)) {
-            issues.add('At least one of Email or Phone is required');
+        if (String.isBlank(rec.Email__c)) {
+            issues.add('Email is required');
         }
         if (String.isNotBlank(rec.Email__c) && !rec.Email__c.contains('@')) {
             issues.add('Invalid email format: ' + rec.Email__c);
         }
-        if (String.isBlank(rec.Last_Name__c)) issues.add('Last name is required');
 
         if (issues.isEmpty()) {
             return new ValidationResult(true, null);

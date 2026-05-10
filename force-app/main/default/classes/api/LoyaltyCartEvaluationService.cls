@@ -75,7 +75,7 @@ public with sharing class LoyaltyCartEvaluationService {
         String lpmId, List<CartLineItem> lines, String tenderId
     ) {
         Loyalty_Program_Config__mdt cfg = [
-            SELECT Default_Currency__c FROM Loyalty_Program_Config__mdt
+            SELECT Currency_ISO_Code__c FROM Loyalty_Program_Config__mdt
             WHERE DeveloperName = 'Default' LIMIT 1
         ];
 
@@ -83,7 +83,7 @@ public with sharing class LoyaltyCartEvaluationService {
         dto.lpmId          = lpmId;
         dto.journalTypeName = 'Purchase';
         dto.activityDate   = String.valueOf(Date.today());
-        dto.currencyName   = cfg.Default_Currency__c;
+        dto.currencyName   = cfg.Currency_ISO_Code__c;
         dto.tenderType     = tenderId;
         dto.lineItems      = lines;
         return dto;
@@ -106,16 +106,15 @@ public with sharing class LoyaltyCartEvaluationService {
         return resp;
     }
 
-    @TestVisible
-    private static Map<String, Boolean> getExclusionRules() {
+    public static Map<String, Boolean> getExclusionRules() {
         if (exclusionCache == null) {
             exclusionCache = new Map<String, Boolean>();
             for (Loyalty_Exclusion_Rule__mdt rule : [
-                SELECT Product_Category__c, Is_Excluded__c
+                SELECT Rule_Value__c, Is_Active__c
                 FROM   Loyalty_Exclusion_Rule__mdt
-                WHERE  Is_Excluded__c = true
+                WHERE  Is_Active__c = true
             ]) {
-                exclusionCache.put(rule.Product_Category__c, rule.Is_Excluded__c);
+                exclusionCache.put(rule.Rule_Value__c, rule.Is_Active__c);
             }
         }
         return exclusionCache;

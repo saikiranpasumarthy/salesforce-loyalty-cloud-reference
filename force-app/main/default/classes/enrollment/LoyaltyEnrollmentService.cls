@@ -132,7 +132,7 @@ public with sharing class LoyaltyEnrollmentService {
      */
     public EnrollmentRequest buildEnrollmentRequest(Contact c, String memberType) {
         Loyalty_Program_Config__mdt cfg = [
-            SELECT Program_Name__c FROM Loyalty_Program_Config__mdt
+            SELECT Program_API_Name__c FROM Loyalty_Program_Config__mdt
             WHERE DeveloperName = 'Default' LIMIT 1
         ];
 
@@ -142,7 +142,7 @@ public with sharing class LoyaltyEnrollmentService {
         req.email        = c.Email;
         req.phone        = c.Phone;
         req.memberType   = memberType;
-        req.programName  = cfg.Program_Name__c;
+        req.programName  = cfg.Program_API_Name__c;
         return req;
     }
 
@@ -194,11 +194,11 @@ public with sharing class LoyaltyEnrollmentService {
         Id contactId, String lpmId, String loyaltyId, String memberType, String source
     ) {
         Loyalty_Enrollment_Event__e evt = new Loyalty_Enrollment_Event__e(
-            Contact_Id__c       = contactId,
-            LPM_Id__c           = lpmId,
-            Loyalty_Id__c       = loyaltyId,
-            Member_Type__c      = memberType,
-            Enrollment_Source__c = source
+            Contact_Id__c        = contactId,
+            Loyalty_Member_Id__c = loyaltyId,
+            Member_Type__c       = memberType,
+            Program_Name__c      = source,
+            Enrolled_At__c       = DateTime.now()
         );
         EventBus.publish(evt);
     }

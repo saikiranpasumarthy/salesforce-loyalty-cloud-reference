@@ -57,12 +57,13 @@ public with sharing class PointsExpiryBatch implements Database.Batchable<SObjec
 
     public void finish(Database.BatchableContext bc) {
         Batch_Run_Log__c log = new Batch_Run_Log__c(
-            Batch_Name__c    = 'PointsExpiryBatch',
-            Run_Date__c      = DateTime.now(),
-            Total_Records__c = totalExpired + totalSkipped + totalFailed,
-            Succeeded__c     = totalExpired,
-            Failed__c        = totalFailed,
-            Error_Log__c     = failedIds.isEmpty() ? null : String.join(failedIds, '\n').left(131072)
+            Batch_Type__c      = 'PointsExpiryBatch',
+            Completed_At__c    = DateTime.now(),
+            Total_Processed__c = totalExpired + totalSkipped + totalFailed,
+            Total_Succeeded__c = totalExpired,
+            Total_Failed__c    = totalFailed,
+            Error_Summary__c   = failedIds.isEmpty() ? null : String.join(failedIds, '\n').left(131072),
+            Apex_Job_Id__c     = String.valueOf(bc.getJobId())
         );
         insert log;
 

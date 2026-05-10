@@ -77,9 +77,9 @@ public with sharing class PointsExpiryService {
         if (benefits.pointsBalance == null || benefits.pointsBalance <= 0) return;
 
         String currency = [
-            SELECT Default_Currency__c FROM Loyalty_Program_Config__mdt
+            SELECT Currency_ISO_Code__c FROM Loyalty_Program_Config__mdt
             WHERE DeveloperName = 'Default' LIMIT 1
-        ].Default_Currency__c;
+        ].Currency_ISO_Code__c;
 
         txnService.debitPoints(
             c.Loyalty_Member_Id__c,
@@ -108,7 +108,7 @@ public with sharing class PointsExpiryService {
         List<Order_Points_Status__c> records = [
             SELECT CreatedDate
             FROM   Order_Points_Status__c
-            WHERE  LPM_Id__c = :lpmId
+            WHERE  Contact__c IN (SELECT Id FROM Contact WHERE Loyalty_Member_Id__c = :lpmId)
             AND    Status__c = 'Awarded'
             ORDER  BY CreatedDate DESC
             LIMIT  1
