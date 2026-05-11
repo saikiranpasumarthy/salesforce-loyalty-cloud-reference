@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <description>Triggered by the Loyalty_Enrollment_Event__e platform event. Sends a personalised welcome email to the newly enrolled member with their Loyalty ID and tier benefits summary.</description>
+    <environments>Default</environments>
+    <interviewLabel>Welcome Email Trigger Flow {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Welcome Email Trigger Flow</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value><stringValue>LightningFlowBuilder</stringValue></value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>176</locationX>
+        <locationY>48</locationY>
+        <connector>
+            <targetReference>Get_Contact</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <object>Loyalty_Enrollment_Event__e</object>
+        <triggerType>PlatformEvent</triggerType>
+    </start>
+    <status>Draft</status>
+
+    <!-- Get Contact record for email address and first name -->
+    <recordLookups>
+        <name>Get_Contact</name>
+        <label>Get Contact</label>
+        <locationX>176</locationX>
+        <locationY>168</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_Contact_Found</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Contact_Id__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Contact</object>
+        <outputAssignments>
+            <assignToReference>varContactEmail</assignToReference>
+            <field>Email</field>
+        </outputAssignments>
+        <outputAssignments>
+            <assignToReference>varContactFirstName</assignToReference>
+            <field>FirstName</field>
+        </outputAssignments>
+    </recordLookups>
+
+    <!-- Only send if contact has an email -->
+    <decisions>
+        <name>Check_Contact_Found</name>
+        <label>Contact Has Email?</label>
+        <locationX>176</locationX>
+        <locationY>288</locationY>
+        <defaultConnectorLabel>No Email — Skip</defaultConnectorLabel>
+        <rules>
+            <name>Has_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varContactEmail</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Welcome_Email</targetReference>
+            </connector>
+            <label>Has Email</label>
+        </rules>
+    </decisions>
+
+    <!-- Send email using org-wide email address and email template -->
+    <actionCalls>
+        <name>Send_Welcome_Email</name>
+        <label>Send Welcome Email</label>
+        <locationX>176</locationX>
+        <locationY>408</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>varContactEmail</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Welcome to the Loyalty Program, {!varContactFirstName}!</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>Hi {!varContactFirstName},
+
+Congratulations! You have been enrolled in our Loyalty Program.
+
+Your Loyalty Member ID: {!$Record.Loyalty_Member_Id__c}
+Program: {!$Record.Program_Name__c}
+Member Type: {!$Record.Member_Type__c}
+
+Start earning points on your next purchase!
+
+Best regards,
+The Loyalty Team</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+
+    <!-- Variables -->
+    <variables>
+        <name>varContactEmail</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>varContactFirstName</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

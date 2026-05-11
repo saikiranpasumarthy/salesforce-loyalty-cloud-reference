@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <description>Record-triggered flow on Contact. When Has_Loyalty__c becomes true or Loyalty_Member_Type__c changes, syncs the updated member type and tier attributes to Loyalty Cloud via LoyaltyLoginController.syncMemberAttributes(). Prevents infinite re-trigger by checking $Record__Prior values.</description>
+    <environments>Default</environments>
+    <interviewLabel>RCC LPM Attribute Update Flow {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>RCC LPM Attribute Update Flow</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value><stringValue>LightningFlowBuilder</stringValue></value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>176</locationX>
+        <locationY>48</locationY>
+        <connector>
+            <targetReference>Check_Has_Member_Id</targetReference>
+        </connector>
+        <filterLogic>or</filterLogic>
+        <filters>
+            <field>Has_Loyalty__c</field>
+            <operator>IsChanged</operator>
+            <value><booleanValue>true</booleanValue></value>
+        </filters>
+        <filters>
+            <field>Loyalty_Member_Type__c</field>
+            <operator>IsChanged</operator>
+            <value><booleanValue>true</booleanValue></value>
+        </filters>
+        <object>Contact</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Draft</status>
+
+    <!-- Only proceed if the Contact has a Loyalty Member ID to sync to -->
+    <decisions>
+        <name>Check_Has_Member_Id</name>
+        <label>Has Loyalty Member ID?</label>
+        <locationX>176</locationX>
+        <locationY>168</locationY>
+        <defaultConnectorLabel>No Member ID — Skip</defaultConnectorLabel>
+        <rules>
+            <name>Has_Member_Id</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Loyalty_Member_Id__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue><booleanValue>false</booleanValue></rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Has_Loyalty__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue><booleanValue>true</booleanValue></rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Sync_Member_Attributes</targetReference>
+            </connector>
+            <label>Has Member ID and Has Loyalty</label>
+        </rules>
+    </decisions>
+
+    <!-- Sync updated attributes to Loyalty Cloud -->
+    <actionCalls>
+        <name>Sync_Member_Attributes</name>
+        <label>Sync Member Attributes to LC</label>
+        <locationX>176</locationX>
+        <locationY>288</locationY>
+        <actionName>LoyaltyLoginController</actionName>
+        <actionType>apex</actionType>
+        <inputParameters>
+            <name>contactId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+    </actionCalls>
+
+</Flow>

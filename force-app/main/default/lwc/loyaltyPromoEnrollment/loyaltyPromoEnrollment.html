@@ -1,0 +1,56 @@
+<template>
+    <lightning-card title="Promotions" icon-name="utility:announcement">
+        <template if:true={isLoading}>
+            <div class="slds-p-around_medium slds-text-align_center">
+                <lightning-spinner alternative-text="Loading promotions..." size="small"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+            <template if:true={hasPromotions}>
+                <div class="slds-p-around_small">
+                    <template for:each={promotions} for:item="promo">
+                        <div key={promo.promotionId} class="slds-box slds-m-bottom_small">
+                            <lightning-layout vertical-align="center">
+                                <lightning-layout-item flexibility="auto">
+                                    <p class="slds-text-heading_small">{promo.promotionName}</p>
+                                    <p class="slds-text-body_small slds-text-color_weak">
+                                        {promo.startDate} – {promo.endDate}
+                                    </p>
+                                    <span class={promo.statusBadgeClass}>{promo.enrollmentStatus}</span>
+                                </lightning-layout-item>
+                                <lightning-layout-item>
+                                    <template if:true={promo.canEnroll}>
+                                        <lightning-button
+                                            label="Enroll"
+                                            variant="brand"
+                                            data-promo-id={promo.promotionId}
+                                            onclick={handleEnroll}
+                                        ></lightning-button>
+                                    </template>
+                                    <template if:true={promo.canOptOut}>
+                                        <lightning-button
+                                            label="Opt Out"
+                                            variant="destructive-text"
+                                            data-promo-id={promo.promotionId}
+                                            onclick={handleOptOut}
+                                        ></lightning-button>
+                                    </template>
+                                </lightning-layout-item>
+                            </lightning-layout>
+                        </div>
+                    </template>
+                </div>
+            </template>
+            <template if:false={hasPromotions}>
+                <div class="slds-p-around_medium slds-text-align_center slds-text-color_weak">
+                    No promotions available for this member.
+                </div>
+            </template>
+        </template>
+
+        <div slot="footer">
+            <lightning-button label="Refresh" icon-name="utility:refresh" onclick={loadPromotions}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

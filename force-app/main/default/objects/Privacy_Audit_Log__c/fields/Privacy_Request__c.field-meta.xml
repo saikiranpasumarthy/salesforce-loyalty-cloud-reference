@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Privacy_Request__c</fullName>
+    <externalId>false</externalId>
+    <label>Privacy Request</label>
+    <referenceTo>Privacy_Request__c</referenceTo>
+    <relationshipLabel>Privacy Audit Logs</relationshipLabel>
+    <relationshipName>Privacy_Audit_Logs</relationshipName>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

@@ -1,0 +1,35 @@
+<template>
+    <lightning-card title="Certificates &amp; Vouchers" icon-name="utility:gift_card">
+        <!-- Filter tabs -->
+        <div slot="actions">
+            <lightning-button-group>
+                <lightning-button label="Active"   onclick={filterActive}   variant={activeVariant}></lightning-button>
+                <lightning-button label="Redeemed" onclick={filterRedeemed} variant={redeemedVariant}></lightning-button>
+                <lightning-button label="Expired"  onclick={filterExpired}  variant={expiredVariant}></lightning-button>
+            </lightning-button-group>
+        </div>
+
+        <template if:true={isLoading}>
+            <div class="slds-p-around_medium slds-text-align_center">
+                <lightning-spinner alternative-text="Loading vouchers..." size="small"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+            <template if:true={hasVouchers}>
+                <lightning-datatable
+                    key-field="voucherCode"
+                    data={filteredVouchers}
+                    columns={columns}
+                    hide-checkbox-column
+                    onrowaction={handleRowAction}
+                ></lightning-datatable>
+            </template>
+            <template if:false={hasVouchers}>
+                <div class="slds-p-around_medium slds-text-align_center slds-text-color_weak">
+                    No {activeFilter} vouchers found.
+                </div>
+            </template>
+        </template>
+    </lightning-card>
+</template>

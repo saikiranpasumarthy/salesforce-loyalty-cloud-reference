@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+
+    <!-- ── Enrollment ─────────────────────────────────────────────────────── -->
+    <labels>
+        <fullName>Loyalty_Duplicate_Member_Email</fullName>
+        <categories>Loyalty,Enrollment</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicate email during enrollment</shortDescription>
+        <value>A loyalty member already exists with this email address. Please contact support to merge accounts.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Duplicate_Member_Phone</fullName>
+        <categories>Loyalty,Enrollment</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicate phone during enrollment</shortDescription>
+        <value>A loyalty member already exists with this phone number.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Enrollment_Missing_Fields</fullName>
+        <categories>Loyalty,Enrollment</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Enrollment validation — required fields missing</shortDescription>
+        <value>Please complete all required fields before enrolling.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Enrollment_Success</fullName>
+        <categories>Loyalty,Enrollment</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Successful enrollment confirmation</shortDescription>
+        <value>Enrollment successful! Your Loyalty ID is {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Enrollment_Limit_Exceeded</fullName>
+        <categories>Loyalty,Enrollment</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Daily enrollment limit exceeded warning</shortDescription>
+        <value>Daily enrollment limit reached. The enrollment was processed but please notify the operations team.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Invalid_Program</fullName>
+        <categories>Loyalty,Enrollment</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Program not found or inactive</shortDescription>
+        <value>The specified loyalty program is not active. Please contact your administrator.</value>
+    </labels>
+
+    <!-- ── API / Generic Errors ───────────────────────────────────────────── -->
+    <labels>
+        <fullName>Loyalty_API_Error_Generic</fullName>
+        <categories>Loyalty,Error</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Generic Loyalty API error message</shortDescription>
+        <value>An error occurred communicating with the Loyalty system. Please try again or contact support.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_API_Error_Unauthorized</fullName>
+        <categories>Loyalty,Error</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auth failure calling Loyalty API</shortDescription>
+        <value>Authentication to the Loyalty system failed. Please contact your administrator to verify the Named Credential configuration.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_API_Timeout</fullName>
+        <categories>Loyalty,Error</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Loyalty API callout timeout</shortDescription>
+        <value>The Loyalty system did not respond in time. Please retry in a moment.</value>
+    </labels>
+
+    <!-- ── Vouchers ────────────────────────────────────────────────────────── -->
+    <labels>
+        <fullName>Loyalty_Voucher_Expired</fullName>
+        <categories>Loyalty,Voucher</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Voucher has expired</shortDescription>
+        <value>This voucher has expired and can no longer be redeemed.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Voucher_Already_Redeemed</fullName>
+        <categories>Loyalty,Voucher</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Voucher already redeemed</shortDescription>
+        <value>This voucher has already been redeemed.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Voucher_Not_Found</fullName>
+        <categories>Loyalty,Voucher</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Voucher not found</shortDescription>
+        <value>The voucher could not be found. Please verify the voucher code and try again.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Voucher_Insufficient_Value</fullName>
+        <categories>Loyalty,Voucher</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Voucher value insufficient for transaction</shortDescription>
+        <value>The voucher value is insufficient for this transaction.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Voucher_Member_Mismatch</fullName>
+        <categories>Loyalty,Voucher</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Voucher belongs to a different member</shortDescription>
+        <value>This voucher is not associated with the current member account.</value>
+    </labels>
+
+    <!-- ── Points / Transactions ──────────────────────────────────────────── -->
+    <labels>
+        <fullName>Loyalty_Insufficient_Balance</fullName>
+        <categories>Loyalty,Transaction</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Insufficient points balance for debit</shortDescription>
+        <value>Insufficient points balance. Please verify the available balance and retry.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Points_Adjustment_Success</fullName>
+        <categories>Loyalty,Transaction</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Points adjustment completed successfully</shortDescription>
+        <value>Points adjustment of {0} applied successfully to member {1}.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Points_Adjustment_Reason_Required</fullName>
+        <categories>Loyalty,Transaction</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Adjustment reason is required</shortDescription>
+        <value>A reason is required for manual points adjustments.</value>
+    </labels>
+
+    <!-- ── Privacy / GDPR ─────────────────────────────────────────────────── -->
+    <labels>
+        <fullName>Privacy_Deletion_Open_Orders_Blocked</fullName>
+        <categories>Privacy</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Deletion blocked due to open orders</shortDescription>
+        <value>This deletion request cannot be processed because the member has open orders. Please resolve all open orders first.</value>
+    </labels>
+    <labels>
+        <fullName>Privacy_Deletion_Success</fullName>
+        <categories>Privacy</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Privacy deletion completed</shortDescription>
+        <value>Data deletion completed successfully. Systems updated: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Privacy_Deletion_Partial_Failure</fullName>
+        <categories>Privacy</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Privacy deletion partial failure</shortDescription>
+        <value>Data deletion completed with warnings. Some systems may require manual follow-up. Reference: {0}.</value>
+    </labels>
+
+    <!-- ── Tiers ───────────────────────────────────────────────────────────── -->
+    <labels>
+        <fullName>Loyalty_Tier_Update_Success</fullName>
+        <categories>Loyalty,Tier</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Tier update succeeded</shortDescription>
+        <value>Member tier updated to {0} successfully.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Tier_Unknown_Code</fullName>
+        <categories>Loyalty,Tier</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Unknown legacy tier code received</shortDescription>
+        <value>Unknown tier code: {0}. Defaulting to Preferred. Please update Tier_Mapping__mdt.</value>
+    </labels>
+
+    <!-- ── RCC Batch ─────────────────────────────────────────────────────────── -->
+    <labels>
+        <fullName>RCC_Batch_Complete_Subject</fullName>
+        <categories>RCC,Batch</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Email subject for RCC batch completion notification</shortDescription>
+        <value>RCC Card Import Complete — {0} processed, {1} failed</value>
+    </labels>
+    <labels>
+        <fullName>RCC_Batch_Error_Row</fullName>
+        <categories>RCC,Batch</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error description for a failed RCC row</shortDescription>
+        <value>Row {0}: {1}</value>
+    </labels>
+
+    <!-- ── Deduplication ─────────────────────────────────────────────────── -->
+    <labels>
+        <fullName>Loyalty_Dedup_High_Confidence_Match</fullName>
+        <categories>Loyalty,Deduplication</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>High confidence duplicate found</shortDescription>
+        <value>A high-confidence duplicate member was found (score: {0}). Enrollment blocked pending review.</value>
+    </labels>
+    <labels>
+        <fullName>Loyalty_Dedup_Review_Required</fullName>
+        <categories>Loyalty,Deduplication</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Potential duplicate flagged for review</shortDescription>
+        <value>A potential duplicate was flagged for review (score: {0}). Enrollment proceeded but please verify.</value>
+    </labels>
+
+</CustomLabels>

@@ -1,0 +1,521 @@
+{
+  "info": {
+    "name": "Salesforce Loyalty Cloud API",
+    "description": "Complete collection for Salesforce Loyalty Management (SLM) Connect API endpoints. All requests assume a valid OAuth Bearer token in the {{access_token}} collection variable.\n\nSetup:\n1. Set {{base_url}} to your org's My Domain URL (e.g. https://myorg.my.salesforce.com)\n2. Set {{program_name}} to your Loyalty Cloud program API name\n3. Authenticate via the 'Auth — Get Bearer Token' request and copy the token to {{access_token}}\n4. Set {{member_id}}, {{voucher_id}}, {{contact_id}} as needed",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "slm-loyalty-reference-v1"
+  },
+  "variable": [
+    { "key": "base_url",     "value": "https://yourorg.my.salesforce.com" },
+    { "key": "api_version",  "value": "v62.0" },
+    { "key": "program_name", "value": "DefaultLoyaltyProgram" },
+    { "key": "member_id",    "value": "" },
+    { "key": "voucher_id",   "value": "" },
+    { "key": "contact_id",   "value": "" },
+    { "key": "access_token", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }]
+  },
+  "item": [
+
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Get Bearer Token (Username-Password Flow)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "    pm.collectionVariables.set('access_token', json.access_token);",
+                  "    pm.collectionVariables.set('base_url', json.instance_url);",
+                  "    console.log('Token stored. Instance: ' + json.instance_url);",
+                  "}",
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has access_token', () => pm.expect(json.access_token).to.not.be.empty);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/oauth2/token",
+              "host": ["{{base_url}}"],
+              "path": ["services", "oauth2", "token"],
+              "query": [
+                { "key": "grant_type", "value": "password" },
+                { "key": "client_id",     "value": "{{client_id}}" },
+                { "key": "client_secret", "value": "{{client_secret}}" },
+                { "key": "username",      "value": "{{sf_username}}" },
+                { "key": "password",      "value": "{{sf_password}}" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Enrollment",
+      "item": [
+        {
+          "name": "Enroll New Member",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"membershipNumber\": null,\n  \"memberStatus\": \"Active\",\n  \"memberType\": \"{{member_type}}\",\n  \"contactId\": \"{{contact_id}}\",\n  \"additionalBonusPoints\": 0,\n  \"enrollmentDate\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/members",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "members"]
+            },
+            "description": "Enrolls a Contact into the Loyalty Program. On success, the response contains the memberId — store it in {{member_id}}."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                  "var json = pm.response.json();",
+                  "if (json.memberId) pm.collectionVariables.set('member_id', json.memberId);",
+                  "pm.test('Has memberId', () => pm.expect(json.memberId).to.not.be.empty);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Member by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/members/{{member_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "members", "{{member_id}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has memberStatus', () => pm.expect(pm.response.json().memberStatus).to.not.be.empty);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Member Attributes",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"memberType\": \"Pro\",\n  \"memberStatus\": \"Active\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/members/{{member_id}}/attributes",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "members", "{{member_id}}", "attributes"]
+            }
+          }
+        },
+        {
+          "name": "Unenroll Member (Privacy Deletion)",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/members/{{member_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "members", "{{member_id}}"]
+            },
+            "description": "Removes the member from the Loyalty Program. Called by PrivacyDeletionService as Gate 3 of the erasure workflow."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Accrue Points (Order Fulfilment)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"membershipNumber\": \"{{member_id}}\",\n  \"journalTypeName\": \"Order_Points_Accrual\",\n  \"journalSubTypeName\": \"Accrual\",\n  \"transactionJournalDate\": \"{{$isoTimestamp}}\",\n  \"referenceId\": \"ORDER-{{$randomInt}}\",\n  \"transactionJournalAttributes\": [\n    { \"name\": \"Order_Amount\", \"value\": \"150.00\" },\n    { \"name\": \"Channel\",      \"value\": \"Online\" }\n  ],\n  \"transactionJournalProducts\": [\n    {\n      \"productCode\": \"SKU-001\",\n      \"productName\": \"Widget A\",\n      \"quantity\": 2,\n      \"productCategory\": \"Electronics\",\n      \"grossUnitPrice\": 50.00,\n      \"netUnitPrice\": 45.00\n    },\n    {\n      \"productCode\": \"SKU-002\",\n      \"productName\": \"Gadget B\",\n      \"quantity\": 1,\n      \"productCategory\": \"Electronics\",\n      \"grossUnitPrice\": 50.00,\n      \"netUnitPrice\": 50.00\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/transaction-journals",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "transaction-journals"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                  "pm.test('Has journalId', () => pm.expect(pm.response.json().journalId).to.not.be.empty);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Manual Points Adjustment (Credit)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"membershipNumber\": \"{{member_id}}\",\n  \"journalTypeName\": \"Manual_Points_Adjustment\",\n  \"journalSubTypeName\": \"Accrual\",\n  \"transactionJournalDate\": \"{{$isoTimestamp}}\",\n  \"referenceId\": \"ADJ-{{$randomInt}}\",\n  \"transactionJournalAttributes\": [\n    { \"name\": \"Reason\",     \"value\": \"Customer service goodwill credit\" },\n    { \"name\": \"Agent_Name\", \"value\": \"John Agent\" }\n  ],\n  \"points\": 500\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/transaction-journals",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "transaction-journals"]
+            }
+          }
+        },
+        {
+          "name": "Debit Points (Cancellation Reversal)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"membershipNumber\": \"{{member_id}}\",\n  \"journalTypeName\": \"Order_Points_Reversal\",\n  \"journalSubTypeName\": \"Debit\",\n  \"transactionJournalDate\": \"{{$isoTimestamp}}\",\n  \"referenceId\": \"ORDER-12345-CANCEL\",\n  \"points\": -200\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/transaction-journals",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "transaction-journals"]
+            }
+          }
+        },
+        {
+          "name": "Get Transaction History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/transaction-journals?membershipNumber={{member_id}}&pageSize=20",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "transaction-journals"],
+              "query": [
+                { "key": "membershipNumber", "value": "{{member_id}}" },
+                { "key": "pageSize",          "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Points Expiry (Scheduled Debit)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"membershipNumber\": \"{{member_id}}\",\n  \"journalTypeName\": \"Points_Expiry\",\n  \"journalSubTypeName\": \"Expiry\",\n  \"transactionJournalDate\": \"{{$isoTimestamp}}\",\n  \"referenceId\": \"EXPIRY-{{$isoTimestamp}}\",\n  \"points\": -1000,\n  \"transactionJournalAttributes\": [\n    { \"name\": \"Expiry_Reason\", \"value\": \"Annual inactivity expiry\" }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/transaction-journals",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "transaction-journals"]
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Vouchers",
+      "item": [
+        {
+          "name": "Get Member Vouchers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/members/{{member_id}}/vouchers?voucherStatus=Active",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "members", "{{member_id}}", "vouchers"],
+              "query": [
+                { "key": "voucherStatus", "value": "Active" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "if (json.vouchers && json.vouchers.length > 0) {",
+                  "    pm.collectionVariables.set('voucher_id', json.vouchers[0].voucherId);",
+                  "    console.log('Stored first voucher ID: ' + json.vouchers[0].voucherId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Redeem Voucher at Checkout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"membershipNumber\": \"{{member_id}}\",\n  \"redemptionDate\": \"{{$isoTimestamp}}\",\n  \"transactionReferenceId\": \"ORDER-{{$randomInt}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/vouchers/{{voucher_id}}/redeem",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "vouchers", "{{voucher_id}}", "redeem"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Voucher (Order Cancellation)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"membershipNumber\": \"{{member_id}}\",\n  \"cancellationDate\": \"{{$isoTimestamp}}\",\n  \"cancellationReason\": \"Order cancelled by customer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/vouchers/{{voucher_id}}/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "vouchers", "{{voucher_id}}", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Benefits",
+      "item": [
+        {
+          "name": "Get Member Benefits",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/members/{{member_id}}/benefits",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "members", "{{member_id}}", "benefits"]
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Tiers",
+      "item": [
+        {
+          "name": "Get Program Tiers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/tiers",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "tiers"]
+            }
+          }
+        },
+        {
+          "name": "Update Member Tier",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tierName\": \"Elite\",\n  \"effectiveDate\": \"{{$isoTimestamp}}\",\n  \"reason\": \"Manual upgrade by agent\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/members/{{member_id}}/tier",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "members", "{{member_id}}", "tier"]
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Promotions",
+      "item": [
+        {
+          "name": "Get Available Promotions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/promotions?membershipNumber={{member_id}}&promotionStatus=Active",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "promotions"],
+              "query": [
+                { "key": "membershipNumber", "value": "{{member_id}}" },
+                { "key": "promotionStatus",  "value": "Active" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Enroll Member in Promotion",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"membershipNumber\": \"{{member_id}}\",\n  \"enrollmentDate\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/promotions/{{promo_id}}/enroll",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "promotions", "{{promo_id}}", "enroll"]
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Cart Evaluation",
+      "item": [
+        {
+          "name": "Evaluate Cart for Points Preview",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"membershipNumber\": \"{{member_id}}\",\n  \"cartLines\": [\n    {\n      \"productCode\": \"SKU-001\",\n      \"productName\": \"Widget A\",\n      \"quantity\": 2,\n      \"productCategory\": \"Electronics\",\n      \"grossUnitPrice\": 50.00,\n      \"netUnitPrice\": 45.00\n    },\n    {\n      \"productCode\": \"GIFTCARD-100\",\n      \"productName\": \"$100 Gift Card\",\n      \"quantity\": 1,\n      \"productCategory\": \"Gift Cards\",\n      \"grossUnitPrice\": 100.00,\n      \"netUnitPrice\": 100.00\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/connect/loyalty/programs/{{program_name}}/cart/evaluate",
+              "host": ["{{base_url}}"],
+              "path": ["services", "data", "{{api_version}}", "connect", "loyalty", "programs", "{{program_name}}", "cart", "evaluate"]
+            },
+            "description": "Returns points-preview for the cart. Note: GIFTCARD-100 should be excluded by the Loyalty_Exclusion_Rule__mdt rule — verify exclusion in the response."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Custom REST Endpoints",
+      "item": [
+        {
+          "name": "Composite Member Lookup (POS)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/services/apexrest/loyalty/member/{{member_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["services", "apexrest", "loyalty", "member", "{{member_id}}"]
+            },
+            "description": "Single-request composite response for POS terminals. Returns Contact fields + benefits + vouchers."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Has tier', () => pm.expect(json.tier).to.not.be.empty);",
+                  "pm.test('Has pointsBalance', () => pm.expect(json.pointsBalance).to.be.a('number'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Phone Lookup (POS)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+14155550123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/apexrest/loyalty/lookup",
+              "host": ["{{base_url}}"],
+              "path": ["services", "apexrest", "loyalty", "lookup"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Has found flag', () => pm.expect(json).to.have.property('found'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Privacy Deletion — Erasure Request (OneTrust Webhook)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oneTrustRequestId\": \"OT-TEST-{{$randomInt}}\",\n  \"jurisdiction\": \"GDPR\",\n  \"requestType\": \"Erasure\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/apexrest/privacy/delete/{{contact_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["services", "apexrest", "privacy", "delete", "{{contact_id}}"]
+            },
+            "description": "WARNING: This will anonymise the Contact record and unenroll from LC. Use a test Contact only."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Has status field', () => pm.expect(json.status).to.be.oneOf(['completed', 'blocked', 'failed']));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
